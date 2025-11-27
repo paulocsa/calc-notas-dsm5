@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boletim DSM 5 (2025)</title>
+    <title>Boletim DSM - 5º e 6º Semestre</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -15,20 +15,32 @@
         .tab-btn { transition: all 0.2s; border-bottom: 3px solid transparent; opacity: 0.6; }
         .tab-btn.active { opacity: 1; border-color: #991b1b; color: #991b1b; font-weight: bold; }
         
-        /* Utilitário para esconder elementos mantendo no DOM (para evitar reflow agressivo) */
+        .semester-tab { transition: all 0.2s; opacity: 0.7; transform: scale(0.95); }
+        .semester-tab.active { opacity: 1; transform: scale(1); background-color: #7f1d1d; color: white; shadow: lg; }
+        
         .d-none { display: none !important; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-4 pb-20">
+<body class="bg-gray-100 min-h-screen p-2 md:p-4 pb-20">
 
     <div class="max-w-4xl mx-auto">
         
+        <!-- Seleção de Semestre (Topo) -->
+        <div class="flex justify-center gap-4 mb-6">
+            <button onclick="mudarSemestre(5)" id="tabSem5" class="semester-tab active px-6 py-3 rounded-xl bg-white text-gray-700 font-bold shadow-md border border-gray-200">
+                5º Semestre
+            </button>
+            <button onclick="mudarSemestre(6)" id="tabSem6" class="semester-tab px-6 py-3 rounded-xl bg-white text-gray-700 font-bold shadow-md border border-gray-200">
+                6º Semestre
+            </button>
+        </div>
+
         <!-- Painel de Controle Global -->
         <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden mb-6">
             <!-- Header -->
             <div class="bg-red-900 p-4 text-white flex justify-between items-center shadow-md">
                 <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
-                    <i class="fas fa-book-open"></i> Boletim DSM 5
+                    <i class="fas fa-calculator"></i> <span id="titulo-header">Boletim DSM 5</span>
                 </h1>
                 
                 <!-- Input QTE Global -->
@@ -42,14 +54,21 @@
                 </div>
             </div>
 
-            <!-- Abas de Modo -->
-            <div class="flex border-b border-gray-200 bg-gray-50">
-                <button onclick="mudarModo('com_maratona')" id="btnComMrt" class="flex-1 py-3 text-sm font-medium text-gray-700 tab-btn active">
+            <!-- Abas de Modo (Apenas visível no DSM 5) -->
+            <div id="abas-modo-dsm5" class="flex border-b border-gray-200 bg-gray-50">
+                <button onclick="mudarModoDSM5('com_maratona')" id="btnComMrt" class="flex-1 py-3 text-sm font-medium text-gray-700 tab-btn active">
                     <i class="fas fa-users mr-2"></i>Com Maratona
                 </button>
-                <button onclick="mudarModo('sem_maratona')" id="btnSemMrt" class="flex-1 py-3 text-sm font-medium text-gray-700 tab-btn">
+                <button onclick="mudarModoDSM5('sem_maratona')" id="btnSemMrt" class="flex-1 py-3 text-sm font-medium text-gray-700 tab-btn">
                     <i class="fas fa-user-slash mr-2"></i>Sem Maratona
                 </button>
+            </div>
+
+             <!-- Aviso DSM 6 (Apenas visível no DSM 6) -->
+             <div id="aviso-dsm6" class="d-none bg-blue-50 p-3 text-center border-b border-blue-100">
+                <p class="text-xs text-blue-800 font-bold">
+                    <i class="fas fa-info-circle mr-1"></i> Fórmula exclusiva DSM 6: (4*(ATs) + 3*AVI + 3*PJI)/10
+                </p>
             </div>
             
             <!-- Resumo -->
@@ -69,15 +88,39 @@
             </div>
         </div>
 
-        <!-- Lista de Matérias -->
+        <!-- Lista de Matérias (Renderizado via JS) -->
         <div id="listaMaterias" class="space-y-4">
             <!-- Cards inseridos via JS -->
         </div>
     </div>
 
     <script>
-        // --- Configuração ---
-        const CONFIG = {
+        // --- Dados das Matérias ---
+        
+        // DSM 5 (Mantido original)
+        let materiasDSM5 = [
+            { id: 501, nome: "Segurança no Desenv. de Aplicações", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 502, nome: "Lab. de Desenv. Disp. Móveis (LDDM)", tipo: 'lddm', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 503, nome: "Prog. para Dispositivos Móveis II", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 504, nome: "Aprendizagem de Máquina", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 505, nome: "Computação em Nuvem I", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 506, nome: "Fundamentos da Redação Técnica", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 507, nome: "Inglês III", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } }
+        ];
+
+        // DSM 6 (Novo - Exclusivo)
+        let materiasDSM6 = [
+            { id: 601, nome: "Mineração de Dados", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
+            { id: 602, nome: "Lab. de Des. Multiplataforma", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
+            { id: 603, nome: "Qualidade e Testes de Software", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
+            { id: 604, nome: "Proc. de Linguagem Natural", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
+            { id: 605, nome: "Computação em Nuvem II", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
+            { id: 606, nome: "Ética Profissional e Patente", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
+            { id: 607, nome: "Inglês IV", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } }
+        ];
+
+        // --- Configuração DSM 5 ---
+        const CONFIG_DSM5 = {
             com_maratona: {
                 geral: { nome: "Padrão", weights: { AT1: 1, AT2: 1, AVI: 3, PJI: 3, MRT: 1, LP: 1 } },
                 lddm: { nome: "Laboratório (LDDM)", weights: { AT1: 0.5, AT2: 0.5, AVI: 3, PJI: 3, MRT: 1, LP: 2 } }
@@ -88,68 +131,108 @@
             }
         };
 
-        let modoAtual = 'com_maratona';
+        // Estado Global
+        let semestreAtual = 5;
+        let modoDSM5 = 'com_maratona';
         let valorQTEGlobal = 0;
 
-        let materias = [
-            { id: 1, nome: "Segurança no Desenvolvimento de Aplicações", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 2, nome: "Laboratório de Desenv. para Dispositivos Móveis", tipo: 'lddm', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 3, nome: "Programação para Dispositivos Móveis II", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 4, nome: "Aprendizagem de Máquina", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 5, nome: "Computação em Nuvem I", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 6, nome: "Fundamentos da Redação Técnica", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 7, nome: "Inglês III", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } }
-        ];
+        // --- Funções de Controle ---
 
-        // --- Controle ---
-        function mudarModo(novoModo) {
-            modoAtual = novoModo;
+        function mudarSemestre(sem) {
+            semestreAtual = sem;
+            
+            // Atualiza UI das abas superiores
+            const tab5 = document.getElementById('tabSem5');
+            const tab6 = document.getElementById('tabSem6');
+            const headerTitle = document.getElementById('titulo-header');
+            const abasModoDSM5 = document.getElementById('abas-modo-dsm5');
+            const avisoDSM6 = document.getElementById('aviso-dsm6');
+
+            if (sem === 5) {
+                tab5.classList.add('active', 'bg-red-800', 'text-white');
+                tab5.classList.remove('bg-white', 'text-gray-700');
+                tab6.classList.remove('active', 'bg-red-800', 'text-white');
+                tab6.classList.add('bg-white', 'text-gray-700');
+                
+                headerTitle.innerText = "Boletim DSM 5";
+                abasModoDSM5.classList.remove('d-none');
+                avisoDSM6.classList.add('d-none');
+            } else {
+                tab6.classList.add('active', 'bg-red-800', 'text-white');
+                tab6.classList.remove('bg-white', 'text-gray-700');
+                tab5.classList.remove('active', 'bg-red-800', 'text-white');
+                tab5.classList.add('bg-white', 'text-gray-700');
+                
+                headerTitle.innerText = "Boletim DSM 6";
+                abasModoDSM5.classList.add('d-none');
+                avisoDSM6.classList.remove('d-none');
+            }
+
+            renderLista();
+        }
+
+        function mudarModoDSM5(novoModo) {
+            modoDSM5 = novoModo;
             document.getElementById('btnComMrt').className = `flex-1 py-3 text-sm font-medium text-gray-700 tab-btn ${novoModo === 'com_maratona' ? 'active' : ''}`;
             document.getElementById('btnSemMrt').className = `flex-1 py-3 text-sm font-medium text-gray-700 tab-btn ${novoModo === 'sem_maratona' ? 'active' : ''}`;
-            renderCompleto(); // Recria tudo apenas ao trocar de modo
+            renderLista();
         }
 
         function atualizarQTEGlobal(valor) {
             valorQTEGlobal = parseFloat(valor) || 0;
             if (valorQTEGlobal > 1.3) valorQTEGlobal = 1.3;
             
-            // Atualiza apenas os valores visuais, sem recriar inputs
-            materias.forEach(m => atualizarVisualMateria(m));
+            // Atualiza visual sem recriar DOM
+            const lista = semestreAtual === 5 ? materiasDSM5 : materiasDSM6;
+            lista.forEach(m => atualizarVisualMateria(m));
             atualizarContadoresGlobais();
         }
 
         function atualizarNota(id, campo, valor) {
-            const materia = materias.find(m => m.id === id);
+            const lista = semestreAtual === 5 ? materiasDSM5 : materiasDSM6;
+            const materia = lista.find(m => m.id === id);
+            
             if (materia) {
                 materia.notas[campo] = valor;
-                
-                // ATENÇÃO: Não chamamos renderCompleto() aqui!
-                // Atualizamos apenas o visual desta matéria específica
                 atualizarVisualMateria(materia);
                 atualizarContadoresGlobais();
             }
         }
 
         // --- Renderização ---
-        
-        function renderCompleto() {
+
+        function renderLista() {
             const container = document.getElementById('listaMaterias');
             container.innerHTML = '';
             
-            materias.forEach(materia => {
-                const configMateria = CONFIG[modoAtual][materia.tipo];
-                
-                // HTML fixo com IDs únicos para atualização posterior
+            const lista = semestreAtual === 5 ? materiasDSM5 : materiasDSM6;
+
+            lista.forEach(materia => {
+                let camposInputs = '';
+                let nomeTipo = '';
+
+                // Lógica de Inputs baseada no Semestre
+                if (semestreAtual === 5) {
+                    const config = CONFIG_DSM5[modoDSM5][materia.tipo];
+                    nomeTipo = config.nome;
+                    camposInputs = gerarInputsDSM5(materia, config.weights);
+                } else {
+                    // DSM 6 fixo
+                    nomeTipo = "Padrão DSM 6";
+                    camposInputs = gerarInputsDSM6(materia);
+                }
+
+                // Template Card
                 const html = `
                     <div id="card-${materia.id}" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden slide-down transition-all group">
-                        <!-- Header -->
+                        <!-- Header Card -->
                         <div class="p-4 flex items-center justify-between border-b border-gray-100 bg-gray-50">
                             <div class="flex items-center gap-3 overflow-hidden">
                                 <div id="barra-${materia.id}" class="w-1.5 h-12 rounded-full bg-gray-300 transition-colors"></div>
                                 <div>
                                     <h3 class="font-bold text-gray-800 truncate w-40 md:w-auto text-sm md:text-base group-hover:text-red-900 transition-colors">${materia.nome}</h3>
                                     <div class="flex items-center gap-2 mt-1">
-                                        <span class="text-[10px] uppercase font-bold tracking-wider text-gray-500 border border-gray-200 px-1.5 rounded bg-white">${configMateria.nome}</span>
+                                        <span class="text-[10px] uppercase font-bold tracking-wider text-gray-500 border border-gray-200 px-1.5 rounded bg-white">${nomeTipo}</span>
                                         <span id="badge-qte-${materia.id}" class="hidden text-[10px] text-blue-600 bg-blue-50 px-1 rounded border border-blue-100 font-bold"></span>
                                     </div>
                                 </div>
@@ -160,17 +243,17 @@
                             </div>
                         </div>
 
-                        <!-- Corpo -->
+                        <!-- Corpo Inputs -->
                         <div class="block bg-white p-4">
                             <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
-                                ${gerarInputs(materia, configMateria.weights)}
+                                ${camposInputs}
                             </div>
 
-                            <!-- Exame (Sempre renderizado, controlado via CSS) -->
+                            <!-- Exame -->
                             <div id="box-exame-${materia.id}" class="d-none flex flex-col md:flex-row gap-4 mt-4 bg-yellow-50 p-3 rounded-lg border border-yellow-200 shadow-sm">
                                 <div class="flex-1">
                                     <label class="text-[10px] font-bold text-yellow-800 flex items-center gap-1 mb-1 uppercase tracking-wider">
-                                        <i class="fas fa-exclamation-circle"></i> Necessário Exame Final
+                                        <i class="fas fa-exclamation-circle"></i> Exame Final Necessário
                                     </label>
                                     <div class="flex gap-2 items-center">
                                         <input type="number" step="0.1" min="0" max="10" 
@@ -191,15 +274,13 @@
                     </div>
                 `;
                 container.innerHTML += html;
-                
-                // Atualiza visual inicial sem recriar
                 atualizarVisualMateria(materia);
             });
-            
+
             atualizarContadoresGlobais();
         }
 
-        function gerarInputs(materia, weights) {
+        function gerarInputsDSM5(materia, weights) {
             return Object.keys(weights).map(campo => `
                 <div class="relative group-input">
                     <label class="block text-[10px] font-bold text-gray-500 mb-1 text-center">${campo} <span class="text-gray-300 font-normal ml-0.5 text-[9px] bg-gray-100 px-1 rounded">x${weights[campo]}</span></label>
@@ -211,95 +292,55 @@
             `).join('');
         }
 
-        // --- Lógica Visual e de Cálculo ---
-
-        function atualizarVisualMateria(materia) {
-            const status = calcularStatus(materia);
-            const temNota = Object.values(materia.notas).some(v => v !== '' && v !== 0 && v !== undefined);
-            const ativo = valorQTEGlobal > 0 || temNota;
-
-            // Elementos DOM
-            const elBarra = document.getElementById(`barra-${materia.id}`);
-            const elMedia = document.getElementById(`media-texto-${materia.id}`);
-            const elBadgeQte = document.getElementById(`badge-qte-${materia.id}`);
-            const elBoxExame = document.getElementById(`box-exame-${materia.id}`);
-            const elMpInfo = document.getElementById(`mp-info-${materia.id}`);
-            const elFooter = document.getElementById(`footer-status-${materia.id}`);
-            const elDetalhe = document.getElementById(`detalhe-${materia.id}`);
-            const elMsgFinal = document.getElementById(`msg-final-${materia.id}`);
-
-            if (!elBarra) return; // Segurança
-
-            // Cores
-            if (ativo) {
-                elBarra.className = `w-1.5 h-12 rounded-full transition-colors ${status.corBarra}`;
-                elMedia.className = `text-2xl font-bold ${status.corTexto}`;
-                elMedia.innerText = status.notaFinal;
-            } else {
-                elBarra.className = `w-1.5 h-12 rounded-full bg-gray-300 transition-colors`;
-                elMedia.className = `text-2xl font-bold text-gray-400`;
-                elMedia.innerText = '-';
-            }
-
-            // QTE Badge
-            if (valorQTEGlobal > 0) {
-                elBadgeQte.innerText = `+${valorQTEGlobal} QTE`;
-                elBadgeQte.classList.remove('hidden');
-            } else {
-                elBadgeQte.classList.add('hidden');
-            }
-
-            // Box Exame
-            if (status.precisaExame) {
-                elBoxExame.classList.remove('d-none');
-                elMpInfo.innerText = `MP: ${status.mpSemExame}`;
-            } else {
-                elBoxExame.classList.add('d-none');
-            }
-
-            // Footer
-            if (ativo) {
-                elFooter.classList.remove('d-none');
-                elDetalhe.innerText = status.detalhe;
-                elMsgFinal.innerText = status.mensagemFinal;
-                elMsgFinal.className = `font-bold text-sm ${status.corTexto}`;
-            } else {
-                elFooter.classList.add('d-none');
-            }
+        function gerarInputsDSM6(materia) {
+            // Campos fixos DSM 6: AT1, AT2, AVI, PJI
+            const campos = ['AT1', 'AT2', 'AVI', 'PJI'];
+            return campos.map(campo => `
+                <div class="relative group-input">
+                    <label class="block text-[10px] font-bold text-gray-500 mb-1 text-center">${campo}</label>
+                    <input type="number" step="0.1" min="0" max="10" 
+                        value="${materia.notas[campo] || ''}" 
+                        oninput="atualizarNota(${materia.id}, '${campo}', this.value)"
+                        class="w-full p-2.5 text-center text-sm font-bold text-gray-700 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none bg-gray-50 focus:bg-white placeholder-gray-200 transition-all shadow-sm hover:border-gray-300" placeholder="-">
+                </div>
+            `).join('');
         }
 
-        function atualizarContadoresGlobais() {
-            let aprovadas = 0, exame = 0, reprovadas = 0;
-
-            materias.forEach(materia => {
-                const status = calcularStatus(materia);
-                const temNota = Object.values(materia.notas).some(v => v !== '' && v !== 0 && v !== undefined);
-                const ativo = valorQTEGlobal > 0 || temNota;
-
-                if (ativo) {
-                    if (status.codigo === 'APROVADO') aprovadas++;
-                    else if (status.codigo === 'EXAME') exame++;
-                    else if (status.codigo === 'REPROVADO') reprovadas++;
-                }
-            });
-
-            document.getElementById('countAprovadas').innerText = aprovadas;
-            document.getElementById('countExame').innerText = exame;
-            document.getElementById('countReprovadas').innerText = reprovadas;
-        }
+        // --- Cálculos ---
 
         function calcularStatus(materia) {
-            const weights = CONFIG[modoAtual][materia.tipo].weights;
-            const n = materia.notas;
-            let soma = 0;
-            
-            Object.keys(weights).forEach(campo => {
-                soma += (parseFloat(n[campo]) || 0) * weights[campo];
-            });
+            let mediaBase = 0;
+            let n = materia.notas;
 
-            let mediaBase = soma / 10;
+            // Lógica de Cálculo
+            if (semestreAtual === 5) {
+                // Cálculo DSM 5 (Ponderada)
+                const weights = CONFIG_DSM5[modoDSM5][materia.tipo].weights;
+                let soma = 0;
+                Object.keys(weights).forEach(campo => {
+                    soma += (parseFloat(n[campo]) || 0) * weights[campo];
+                });
+                mediaBase = soma / 10;
+            } else {
+                // Cálculo DSM 6 (Fórmula Específica)
+                // Fórmula: ((((4.0*((AT1+AT2)/2))+(3.0*AVI)+(3.0*PJI))/10)
+                let at1 = parseFloat(n.AT1) || 0;
+                let at2 = parseFloat(n.AT2) || 0;
+                let avi = parseFloat(n.AVI) || 0;
+                let pji = parseFloat(n.PJI) || 0;
+
+                let mediaATs = (at1 + at2) / 2;
+                let termo1 = 4.0 * mediaATs;
+                let termo2 = 3.0 * avi;
+                let termo3 = 3.0 * pji;
+
+                mediaBase = (termo1 + termo2 + termo3) / 10;
+            }
+
+            // Lógica Comum de Aprovação
             let mp = mediaBase + valorQTEGlobal;
             if (mp > 10) mp = 10.0;
+            
             const mpSemExame = mp.toFixed(1);
 
             let resultado = {
@@ -313,12 +354,15 @@
                 mensagemFinal: ''
             };
 
+            // Regras de Corte
             if (mp >= 6.0) {
                 resultado.codigo = 'APROVADO';
                 resultado.corBarra = 'bg-green-500';
                 resultado.corTexto = 'text-green-600';
                 resultado.mensagemFinal = 'Aprovado Direto';
-            } else if (mp < 2.0) {
+            } else if (mp < 2.0) { // Nota: Regras da Fatec geralmente reprovam direto < 2? Se não, remova este bloco. Mantendo lógica do seu código anterior.
+                // Se o DSM 6 tiver regra diferente para reprovação direta, ajuste aqui.
+                // Assumindo padrão Fatec (Geralmente vai pra exame se >= ? mas seu código original tinha < 2)
                 resultado.codigo = 'REPROVADO';
                 resultado.corBarra = 'bg-red-500';
                 resultado.corTexto = 'text-red-600';
@@ -330,9 +374,14 @@
                 resultado.precisaExame = true;
                 resultado.mensagemFinal = 'Aguardando Exame';
 
+                // Cálculo Pós Exame
                 if (n.EXM !== undefined && n.EXM !== '' && n.EXM !== 0) {
                     const exm = parseFloat(n.EXM);
+                    // Fórmula Fatec Exame: (Média + Exame) / 2
                     let mf = (mp + exm) / 2;
+                    
+                    // Se MF < MP, prevalece MP? Geralmente não na média final, mas na lógica de sistema sim.
+                    // Mantendo sua lógica original:
                     if (mf < mp) mf = mp;
 
                     resultado.notaFinal = mf.toFixed(1);
@@ -354,8 +403,81 @@
             return resultado;
         }
 
-        // Inicializar
-        renderCompleto();
+        // --- Atualização Visual ---
+
+        function atualizarVisualMateria(materia) {
+            const status = calcularStatus(materia);
+            const temNota = Object.values(materia.notas).some(v => v !== '' && v !== 0 && v !== undefined);
+            const ativo = valorQTEGlobal > 0 || temNota;
+
+            const elBarra = document.getElementById(`barra-${materia.id}`);
+            const elMedia = document.getElementById(`media-texto-${materia.id}`);
+            const elBadgeQte = document.getElementById(`badge-qte-${materia.id}`);
+            const elBoxExame = document.getElementById(`box-exame-${materia.id}`);
+            const elMpInfo = document.getElementById(`mp-info-${materia.id}`);
+            const elFooter = document.getElementById(`footer-status-${materia.id}`);
+            const elDetalhe = document.getElementById(`detalhe-${materia.id}`);
+            const elMsgFinal = document.getElementById(`msg-final-${materia.id}`);
+
+            if (!elBarra) return;
+
+            if (ativo) {
+                elBarra.className = `w-1.5 h-12 rounded-full transition-colors ${status.corBarra}`;
+                elMedia.className = `text-2xl font-bold ${status.corTexto}`;
+                elMedia.innerText = status.notaFinal;
+            } else {
+                elBarra.className = `w-1.5 h-12 rounded-full bg-gray-300 transition-colors`;
+                elMedia.className = `text-2xl font-bold text-gray-400`;
+                elMedia.innerText = '-';
+            }
+
+            if (valorQTEGlobal > 0) {
+                elBadgeQte.innerText = `+${valorQTEGlobal} QTE`;
+                elBadgeQte.classList.remove('hidden');
+            } else {
+                elBadgeQte.classList.add('hidden');
+            }
+
+            if (status.precisaExame) {
+                elBoxExame.classList.remove('d-none');
+                elMpInfo.innerText = `MP: ${status.mpSemExame}`;
+            } else {
+                elBoxExame.classList.add('d-none');
+            }
+
+            if (ativo) {
+                elFooter.classList.remove('d-none');
+                elDetalhe.innerText = status.detalhe;
+                elMsgFinal.innerText = status.mensagemFinal;
+                elMsgFinal.className = `font-bold text-sm ${status.corTexto}`;
+            } else {
+                elFooter.classList.add('d-none');
+            }
+        }
+
+        function atualizarContadoresGlobais() {
+            let aprovadas = 0, exame = 0, reprovadas = 0;
+            const lista = semestreAtual === 5 ? materiasDSM5 : materiasDSM6;
+
+            lista.forEach(materia => {
+                const status = calcularStatus(materia);
+                const temNota = Object.values(materia.notas).some(v => v !== '' && v !== 0 && v !== undefined);
+                const ativo = valorQTEGlobal > 0 || temNota;
+
+                if (ativo) {
+                    if (status.codigo === 'APROVADO') aprovadas++;
+                    else if (status.codigo === 'EXAME') exame++;
+                    else if (status.codigo === 'REPROVADO') reprovadas++;
+                }
+            });
+
+            document.getElementById('countAprovadas').innerText = aprovadas;
+            document.getElementById('countExame').innerText = exame;
+            document.getElementById('countReprovadas').innerText = reprovadas;
+        }
+
+        // Inicializar com DSM 5
+        mudarSemestre(5);
     </script>
 </body>
 </html>
