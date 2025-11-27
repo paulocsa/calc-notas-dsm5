@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boletim DSM 5 (2025)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .slide-down { animation: slideDown 0.3s ease-out forwards; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .tab-btn { transition: all 0.2s; border-bottom: 3px solid transparent; opacity: 0.6; }
+        .tab-btn.active { opacity: 1; border-color: #991b1b; color: #991b1b; font-weight: bold; }
+        
+        /* Utilitário para esconder elementos mantendo no DOM (para evitar reflow agressivo) */
+        .d-none { display: none !important; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 pb-20">
+
+    <div class="max-w-4xl mx-auto">
+        
+        <!-- Painel de Controle Global -->
+        <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden mb-6">
+            <!-- Header -->
+            <div class="bg-red-900 p-4 text-white flex justify-between items-center shadow-md">
+                <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
+                    <i class="fas fa-book-open"></i> Boletim DSM 5
+                </h1>
+                
+                <!-- Input QTE Global -->
+                <div class="flex items-center gap-2 bg-red-800 p-1.5 rounded-lg border border-red-700">
+                    <label class="text-[10px] md:text-xs font-bold text-red-200 uppercase tracking-wider whitespace-nowrap">
+                        <i class="fas fa-certificate mr-1"></i>Bônus QTE
+                    </label>
+                    <input type="number" id="globalQte" step="0.1" min="0" max="1.3" 
+                        oninput="atualizarQTEGlobal(this.value)"
+                        class="w-16 p-1 text-center text-sm font-bold text-red-900 rounded focus:ring-2 focus:ring-yellow-400 outline-none bg-white placeholder-red-200" placeholder="0.0">
+                </div>
+            </div>
+
+            <!-- Abas de Modo -->
+            <div class="flex border-b border-gray-200 bg-gray-50">
+                <button onclick="mudarModo('com_maratona')" id="btnComMrt" class="flex-1 py-3 text-sm font-medium text-gray-700 tab-btn active">
+                    <i class="fas fa-users mr-2"></i>Com Maratona
+                </button>
+                <button onclick="mudarModo('sem_maratona')" id="btnSemMrt" class="flex-1 py-3 text-sm font-medium text-gray-700 tab-btn">
+                    <i class="fas fa-user-slash mr-2"></i>Sem Maratona
+                </button>
+            </div>
+            
+            <!-- Resumo -->
+            <div class="grid grid-cols-3 divide-x divide-gray-100 bg-white">
+                <div class="p-3 text-center">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Aprovadas</p>
+                    <p id="countAprovadas" class="text-xl md:text-2xl font-bold text-green-600">0</p>
+                </div>
+                <div class="p-3 text-center">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Exame</p>
+                    <p id="countExame" class="text-xl md:text-2xl font-bold text-yellow-600">0</p>
+                </div>
+                <div class="p-3 text-center">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Reprovadas</p>
+                    <p id="countReprovadas" class="text-xl md:text-2xl font-bold text-red-600">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Matérias -->
+        <div id="listaMaterias" class="space-y-4">
+            <!-- Cards inseridos via JS -->
+        </div>
+    </div>
+
+    <script>
+        // --- Configuração ---
+        const CONFIG = {
+            com_maratona: {
+                geral: { nome: "Padrão", weights: { AT1: 1, AT2: 1, AVI: 3, PJI: 3, MRT: 1, LP: 1 } },
+                lddm: { nome: "Laboratório (LDDM)", weights: { AT1: 0.5, AT2: 0.5, AVI: 3, PJI: 3, MRT: 1, LP: 2 } }
+            },
+            sem_maratona: {
+                geral: { nome: "Sem Maratona", weights: { AT1: 1.5, AT2: 1.5, AVI: 3, PJI: 3, LP: 1 } },
+                lddm: { nome: "Lab (Sem MRT)", weights: { AT1: 1, AT2: 1, AVI: 3, PJI: 3, LP: 2 } }
+            }
+        };
+
+        let modoAtual = 'com_maratona';
+        let valorQTEGlobal = 0;
+
+        let materias = [
+            { id: 1, nome: "Segurança no Desenvolvimento de Aplicações", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 2, nome: "Laboratório de Desenv. para Dispositivos Móveis", tipo: 'lddm', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 3, nome: "Programação para Dispositivos Móveis II", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 4, nome: "Aprendizagem de Máquina", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 5, nome: "Computação em Nuvem I", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 6, nome: "Fundamentos da Redação Técnica", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
+            { id: 7, nome: "Inglês III", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } }
+        ];
+
+        // --- Controle ---
+        function mudarModo(novoModo) {
+            modoAtual = novoModo;
+            document.getElementById('btnComMrt').className = `flex-1 py-3 text-sm font-medium text-gray-700 tab-btn ${novoModo === 'com_maratona' ? 'active' : ''}`;
+            document.getElementById('btnSemMrt').className = `flex-1 py-3 text-sm font-medium text-gray-700 tab-btn ${novoModo === 'sem_maratona' ? 'active' : ''}`;
+            renderCompleto(); // Recria tudo apenas ao trocar de modo
+        }
+
+        function atualizarQTEGlobal(valor) {
+            valorQTEGlobal = parseFloat(valor) || 0;
+            if (valorQTEGlobal > 1.3) valorQTEGlobal = 1.3;
+            
+            // Atualiza apenas os valores visuais, sem recriar inputs
+            materias.forEach(m => atualizarVisualMateria(m));
+            atualizarContadoresGlobais();
+        }
+
+        function atualizarNota(id, campo, valor) {
+            const materia = materias.find(m => m.id === id);
+            if (materia) {
+                materia.notas[campo] = valor;
+                
+                // ATENÇÃO: Não chamamos renderCompleto() aqui!
+                // Atualizamos apenas o visual desta matéria específica
+                atualizarVisualMateria(materia);
+                atualizarContadoresGlobais();
+            }
+        }
+
+        // --- Renderização ---
+        
+        function renderCompleto() {
+            const container = document.getElementById('listaMaterias');
+            container.innerHTML = '';
+            
+            materias.forEach(materia => {
+                const configMateria = CONFIG[modoAtual][materia.tipo];
+                
+                // HTML fixo com IDs únicos para atualização posterior
+                const html = `
+                    <div id="card-${materia.id}" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden slide-down transition-all group">
+                        <!-- Header -->
+                        <div class="p-4 flex items-center justify-between border-b border-gray-100 bg-gray-50">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div id="barra-${materia.id}" class="w-1.5 h-12 rounded-full bg-gray-300 transition-colors"></div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 truncate w-40 md:w-auto text-sm md:text-base group-hover:text-red-900 transition-colors">${materia.nome}</h3>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="text-[10px] uppercase font-bold tracking-wider text-gray-500 border border-gray-200 px-1.5 rounded bg-white">${configMateria.nome}</span>
+                                        <span id="badge-qte-${materia.id}" class="hidden text-[10px] text-blue-600 bg-blue-50 px-1 rounded border border-blue-100 font-bold"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase">Média</p>
+                                <p id="media-texto-${materia.id}" class="text-2xl font-bold text-gray-400">-</p>
+                            </div>
+                        </div>
+
+                        <!-- Corpo -->
+                        <div class="block bg-white p-4">
+                            <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
+                                ${gerarInputs(materia, configMateria.weights)}
+                            </div>
+
+                            <!-- Exame (Sempre renderizado, controlado via CSS) -->
+                            <div id="box-exame-${materia.id}" class="d-none flex flex-col md:flex-row gap-4 mt-4 bg-yellow-50 p-3 rounded-lg border border-yellow-200 shadow-sm">
+                                <div class="flex-1">
+                                    <label class="text-[10px] font-bold text-yellow-800 flex items-center gap-1 mb-1 uppercase tracking-wider">
+                                        <i class="fas fa-exclamation-circle"></i> Necessário Exame Final
+                                    </label>
+                                    <div class="flex gap-2 items-center">
+                                        <input type="number" step="0.1" min="0" max="10" 
+                                            value="${materia.notas.EXM}" 
+                                            oninput="atualizarNota(${materia.id}, 'EXM', this.value)"
+                                            class="w-full p-2 text-sm border border-yellow-300 rounded focus:border-yellow-500 outline-none bg-white font-bold text-yellow-900" placeholder="Nota Exame">
+                                        <span id="mp-info-${materia.id}" class="text-xs font-bold text-yellow-700 whitespace-nowrap"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Footer Status -->
+                            <div id="footer-status-${materia.id}" class="d-none mt-3 flex justify-between items-end border-t border-gray-100 pt-2">
+                                <span id="detalhe-${materia.id}" class="text-[10px] font-mono text-gray-400"></span>
+                                <div id="msg-final-${materia.id}" class="font-bold text-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+                
+                // Atualiza visual inicial sem recriar
+                atualizarVisualMateria(materia);
+            });
+            
+            atualizarContadoresGlobais();
+        }
+
+        function gerarInputs(materia, weights) {
+            return Object.keys(weights).map(campo => `
+                <div class="relative group-input">
+                    <label class="block text-[10px] font-bold text-gray-500 mb-1 text-center">${campo} <span class="text-gray-300 font-normal ml-0.5 text-[9px] bg-gray-100 px-1 rounded">x${weights[campo]}</span></label>
+                    <input type="number" step="0.1" min="0" max="10" 
+                        value="${materia.notas[campo] || ''}" 
+                        oninput="atualizarNota(${materia.id}, '${campo}', this.value)"
+                        class="w-full p-2.5 text-center text-sm font-bold text-gray-700 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-500 outline-none bg-gray-50 focus:bg-white placeholder-gray-200 transition-all shadow-sm hover:border-gray-300" placeholder="-">
+                </div>
+            `).join('');
+        }
+
+        // --- Lógica Visual e de Cálculo ---
+
+        function atualizarVisualMateria(materia) {
+            const status = calcularStatus(materia);
+            const temNota = Object.values(materia.notas).some(v => v !== '' && v !== 0 && v !== undefined);
+            const ativo = valorQTEGlobal > 0 || temNota;
+
+            // Elementos DOM
+            const elBarra = document.getElementById(`barra-${materia.id}`);
+            const elMedia = document.getElementById(`media-texto-${materia.id}`);
+            const elBadgeQte = document.getElementById(`badge-qte-${materia.id}`);
+            const elBoxExame = document.getElementById(`box-exame-${materia.id}`);
+            const elMpInfo = document.getElementById(`mp-info-${materia.id}`);
+            const elFooter = document.getElementById(`footer-status-${materia.id}`);
+            const elDetalhe = document.getElementById(`detalhe-${materia.id}`);
+            const elMsgFinal = document.getElementById(`msg-final-${materia.id}`);
+
+            if (!elBarra) return; // Segurança
+
+            // Cores
+            if (ativo) {
+                elBarra.className = `w-1.5 h-12 rounded-full transition-colors ${status.corBarra}`;
+                elMedia.className = `text-2xl font-bold ${status.corTexto}`;
+                elMedia.innerText = status.notaFinal;
+            } else {
+                elBarra.className = `w-1.5 h-12 rounded-full bg-gray-300 transition-colors`;
+                elMedia.className = `text-2xl font-bold text-gray-400`;
+                elMedia.innerText = '-';
+            }
+
+            // QTE Badge
+            if (valorQTEGlobal > 0) {
+                elBadgeQte.innerText = `+${valorQTEGlobal} QTE`;
+                elBadgeQte.classList.remove('hidden');
+            } else {
+                elBadgeQte.classList.add('hidden');
+            }
+
+            // Box Exame
+            if (status.precisaExame) {
+                elBoxExame.classList.remove('d-none');
+                elMpInfo.innerText = `MP: ${status.mpSemExame}`;
+            } else {
+                elBoxExame.classList.add('d-none');
+            }
+
+            // Footer
+            if (ativo) {
+                elFooter.classList.remove('d-none');
+                elDetalhe.innerText = status.detalhe;
+                elMsgFinal.innerText = status.mensagemFinal;
+                elMsgFinal.className = `font-bold text-sm ${status.corTexto}`;
+            } else {
+                elFooter.classList.add('d-none');
+            }
+        }
+
+        function atualizarContadoresGlobais() {
+            let aprovadas = 0, exame = 0, reprovadas = 0;
+
+            materias.forEach(materia => {
+                const status = calcularStatus(materia);
+                const temNota = Object.values(materia.notas).some(v => v !== '' && v !== 0 && v !== undefined);
+                const ativo = valorQTEGlobal > 0 || temNota;
+
+                if (ativo) {
+                    if (status.codigo === 'APROVADO') aprovadas++;
+                    else if (status.codigo === 'EXAME') exame++;
+                    else if (status.codigo === 'REPROVADO') reprovadas++;
+                }
+            });
+
+            document.getElementById('countAprovadas').innerText = aprovadas;
+            document.getElementById('countExame').innerText = exame;
+            document.getElementById('countReprovadas').innerText = reprovadas;
+        }
+
+        function calcularStatus(materia) {
+            const weights = CONFIG[modoAtual][materia.tipo].weights;
+            const n = materia.notas;
+            let soma = 0;
+            
+            Object.keys(weights).forEach(campo => {
+                soma += (parseFloat(n[campo]) || 0) * weights[campo];
+            });
+
+            let mediaBase = soma / 10;
+            let mp = mediaBase + valorQTEGlobal;
+            if (mp > 10) mp = 10.0;
+            const mpSemExame = mp.toFixed(1);
+
+            let resultado = {
+                notaFinal: mpSemExame,
+                mpSemExame: mpSemExame,
+                codigo: '',
+                corBarra: '',
+                corTexto: '',
+                precisaExame: false,
+                detalhe: `(Média ${mediaBase.toFixed(1)} + QTE ${valorQTEGlobal})`,
+                mensagemFinal: ''
+            };
+
+            if (mp >= 6.0) {
+                resultado.codigo = 'APROVADO';
+                resultado.corBarra = 'bg-green-500';
+                resultado.corTexto = 'text-green-600';
+                resultado.mensagemFinal = 'Aprovado Direto';
+            } else if (mp < 2.0) {
+                resultado.codigo = 'REPROVADO';
+                resultado.corBarra = 'bg-red-500';
+                resultado.corTexto = 'text-red-600';
+                resultado.mensagemFinal = 'Reprovado Direto';
+            } else {
+                resultado.codigo = 'EXAME';
+                resultado.corBarra = 'bg-yellow-500';
+                resultado.corTexto = 'text-yellow-600';
+                resultado.precisaExame = true;
+                resultado.mensagemFinal = 'Aguardando Exame';
+
+                if (n.EXM !== undefined && n.EXM !== '' && n.EXM !== 0) {
+                    const exm = parseFloat(n.EXM);
+                    let mf = (mp + exm) / 2;
+                    if (mf < mp) mf = mp;
+
+                    resultado.notaFinal = mf.toFixed(1);
+                    resultado.detalhe = `(MP ${mp.toFixed(1)} + EXM ${exm.toFixed(1)}) / 2`;
+
+                    if (mf >= 6.0) {
+                        resultado.codigo = 'APROVADO';
+                        resultado.corBarra = 'bg-green-500';
+                        resultado.corTexto = 'text-green-600';
+                        resultado.mensagemFinal = 'Aprovado no Exame';
+                    } else {
+                        resultado.codigo = 'REPROVADO';
+                        resultado.corBarra = 'bg-red-500';
+                        resultado.corTexto = 'text-red-600';
+                        resultado.mensagemFinal = 'Reprovado no Exame';
+                    }
+                }
+            }
+            return resultado;
+        }
+
+        // Inicializar
+        renderCompleto();
+    </script>
+</body>
+</html>
