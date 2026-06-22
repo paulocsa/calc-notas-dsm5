@@ -1,483 +1,544 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boletim DSM - 5º e 6º Semestre</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .slide-down { animation: slideDown 0.3s ease-out forwards; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .tab-btn { transition: all 0.2s; border-bottom: 3px solid transparent; opacity: 0.6; }
-        .tab-btn.active { opacity: 1; border-color: #991b1b; color: #991b1b; font-weight: bold; }
-        
-        .semester-tab { transition: all 0.2s; opacity: 0.7; transform: scale(0.95); }
-        .semester-tab.active { opacity: 1; transform: scale(1); background-color: #7f1d1d; color: white; shadow: lg; }
-        
-        .d-none { display: none !important; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boletim DSM — Fatec Registro</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  body { font-family: 'Inter', sans-serif; }
+  .tab-sem { transition: all .2s; }
+  .tab-sem.active { background:#7f1d1d!important; color:#fff!important; border-color:#7f1d1d!important; }
+  .tab-lp { transition: all .2s; border-bottom: 3px solid transparent; opacity:.6; }
+  .tab-lp.active { opacity:1; border-color:#991b1b; color:#991b1b; font-weight:700; }
+  .d-none { display:none!important; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-5px)} to{opacity:1;transform:translateY(0)} }
+  .fade-in { animation: fadeIn .2s ease-out; }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { opacity:.4; }
+  .input-nota {
+    width:100%; padding:8px 4px; text-align:center; font-size:14px; font-weight:700;
+    color:#374151; border:1px solid #e5e7eb; border-radius:8px;
+    background:#f9fafb; outline:none; transition:all .15s;
+    box-shadow:0 1px 2px rgba(0,0,0,.05);
+  }
+  .input-nota:focus { background:#fff; border-color:#f87171; box-shadow:0 0 0 3px rgba(252,165,165,.3); }
+  .input-nota::placeholder { color:#d1d5db; }
+  .input-global {
+    width:60px; padding:6px 4px; text-align:center; font-size:14px; font-weight:700;
+    color:#1f2937; border-radius:6px; border:none; outline:none;
+    background:rgba(255,255,255,0.15); color:#fff;
+    transition:all .15s;
+  }
+  .input-global:focus { background:rgba(255,255,255,0.25); box-shadow:0 0 0 2px rgba(253,224,71,.6); }
+  .input-global::placeholder { color:rgba(255,255,255,0.4); font-weight:400; }
+  .input-global-readonly {
+    width:60px; padding:6px 4px; text-align:center; font-size:14px; font-weight:700;
+    color:#9ca3af; border-radius:6px; border:1px dashed #e5e7eb; outline:none;
+    background:#f3f4f6; cursor:default;
+  }
+</style>
 </head>
-<body class="bg-gray-100 min-h-screen p-2 md:p-4 pb-20">
+<body class="bg-gray-100 min-h-screen p-2 md:p-4 pb-24">
+<div class="max-w-4xl mx-auto">
 
-    <div class="max-w-4xl mx-auto">
-        
-        <!-- Seleção de Semestre (Topo) -->
-        <div class="flex justify-center gap-4 mb-6">
-            <button onclick="mudarSemestre(5)" id="tabSem5" class="semester-tab active px-6 py-3 rounded-xl bg-white text-gray-700 font-bold shadow-md border border-gray-200">
-                5º Semestre
-            </button>
-            <button onclick="mudarSemestre(6)" id="tabSem6" class="semester-tab px-6 py-3 rounded-xl bg-white text-gray-700 font-bold shadow-md border border-gray-200">
-                6º Semestre
-            </button>
+  <!-- Tabs Semestre -->
+  <div class="flex flex-wrap justify-center gap-2 mb-5">
+    <button class="tab-sem px-4 py-2.5 rounded-xl bg-white text-gray-600 font-semibold shadow-sm border border-gray-200 text-sm" id="ts1" onclick="setSem(1)">DSM1</button>
+    <button class="tab-sem px-4 py-2.5 rounded-xl bg-white text-gray-600 font-semibold shadow-sm border border-gray-200 text-sm" id="ts2" onclick="setSem(2)">DSM2</button>
+    <button class="tab-sem px-4 py-2.5 rounded-xl bg-white text-gray-600 font-semibold shadow-sm border border-gray-200 text-sm" id="ts3" onclick="setSem(3)">DSM3</button>
+    <button class="tab-sem px-4 py-2.5 rounded-xl bg-white text-gray-600 font-semibold shadow-sm border border-gray-200 text-sm" id="ts4" onclick="setSem(4)">DSM4</button>
+    <button class="tab-sem px-4 py-2.5 rounded-xl bg-white text-gray-600 font-semibold shadow-sm border border-gray-200 text-sm" id="ts5" onclick="setSem(5)">DSM5</button>
+    <button class="tab-sem px-4 py-2.5 rounded-xl bg-white text-gray-600 font-semibold shadow-sm border border-gray-200 text-sm" id="ts6" onclick="setSem(6)">DSM6</button>
+  </div>
+
+  <!-- Painel Superior -->
+  <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden mb-5">
+
+    <!-- Header com globais -->
+    <div class="bg-red-900 p-4 text-white">
+      <div class="flex flex-wrap justify-between items-center gap-3 mb-3">
+        <h1 class="text-lg font-bold flex items-center gap-2">
+          <i class="fas fa-calculator"></i>
+          <span id="hdr-title">Boletim DSM1</span>
+        </h1>
+      </div>
+      <!-- Campos globais -->
+      <div class="grid grid-cols-3 gap-3">
+        <!-- AVI -->
+        <div class="bg-red-800 rounded-xl p-3 border border-red-700">
+          <p class="text-[10px] font-bold text-red-200 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+            <i class="fas fa-file-alt"></i> AVI <span class="font-normal normal-case text-red-300 ml-1">— mesma p/ todos</span>
+          </p>
+          <input id="globalAVI" type="number" step="0.1" min="0" max="10" placeholder="0.0"
+            oninput="setGlobal('AVI', this.value)"
+            class="input-global w-full">
         </div>
-
-        <!-- Painel de Controle Global -->
-        <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden mb-6">
-            <!-- Header -->
-            <div class="bg-red-900 p-4 text-white flex justify-between items-center shadow-md">
-                <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
-                    <i class="fas fa-calculator"></i> <span id="titulo-header">Boletim DSM 5</span>
-                </h1>
-                
-                <!-- Input QTE Global -->
-                <div class="flex items-center gap-2 bg-red-800 p-1.5 rounded-lg border border-red-700">
-                    <label class="text-[10px] md:text-xs font-bold text-red-200 uppercase tracking-wider whitespace-nowrap">
-                        <i class="fas fa-certificate mr-1"></i>Bônus QTE
-                    </label>
-                    <input type="number" id="globalQte" step="0.1" min="0" max="1.3" 
-                        oninput="atualizarQTEGlobal(this.value)"
-                        class="w-16 p-1 text-center text-sm font-bold text-red-900 rounded focus:ring-2 focus:ring-yellow-400 outline-none bg-white placeholder-red-200" placeholder="0.0">
-                </div>
-            </div>
-
-            <!-- Abas de Modo (Apenas visível no DSM 5) -->
-            <div id="abas-modo-dsm5" class="flex border-b border-gray-200 bg-gray-50">
-                <button onclick="mudarModoDSM5('com_maratona')" id="btnComMrt" class="flex-1 py-3 text-sm font-medium text-gray-700 tab-btn active">
-                    <i class="fas fa-users mr-2"></i>Com Maratona
-                </button>
-                <button onclick="mudarModoDSM5('sem_maratona')" id="btnSemMrt" class="flex-1 py-3 text-sm font-medium text-gray-700 tab-btn">
-                    <i class="fas fa-user-slash mr-2"></i>Sem Maratona
-                </button>
-            </div>
-
-             <!-- Aviso DSM 6 (Apenas visível no DSM 6) -->
-             <div id="aviso-dsm6" class="d-none bg-blue-50 p-3 text-center border-b border-blue-100">
-                <p class="text-xs text-blue-800 font-bold">
-                    <i class="fas fa-info-circle mr-1"></i> Fórmula exclusiva DSM 6: (4*(ATs) + 3*AVI + 3*PJI)/10
-                </p>
-            </div>
-            
-            <!-- Resumo -->
-            <div class="grid grid-cols-3 divide-x divide-gray-100 bg-white">
-                <div class="p-3 text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Aprovadas</p>
-                    <p id="countAprovadas" class="text-xl md:text-2xl font-bold text-green-600">0</p>
-                </div>
-                <div class="p-3 text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Exame</p>
-                    <p id="countExame" class="text-xl md:text-2xl font-bold text-yellow-600">0</p>
-                </div>
-                <div class="p-3 text-center">
-                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Reprovadas</p>
-                    <p id="countReprovadas" class="text-xl md:text-2xl font-bold text-red-600">0</p>
-                </div>
-            </div>
+        <!-- PJI -->
+        <div class="bg-red-800 rounded-xl p-3 border border-red-700">
+          <p class="text-[10px] font-bold text-red-200 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+            <i class="fas fa-project-diagram"></i> PJI <span class="font-normal normal-case text-red-300 ml-1">— mesma p/ todos</span>
+          </p>
+          <input id="globalPJI" type="number" step="0.1" min="0" max="10" placeholder="0.0"
+            oninput="setGlobal('PJI', this.value)"
+            class="input-global w-full">
         </div>
-
-        <!-- Lista de Matérias (Renderizado via JS) -->
-        <div id="listaMaterias" class="space-y-4">
-            <!-- Cards inseridos via JS -->
+        <!-- QTE -->
+        <div class="bg-red-800 rounded-xl p-3 border border-red-700">
+          <p class="text-[10px] font-bold text-red-200 uppercase tracking-wider mb-1.5 flex items-center gap-1">
+            <i class="fas fa-certificate"></i> QTE <span class="font-normal normal-case text-red-300 ml-1">— bônus 0–1,3</span>
+          </p>
+          <input id="globalQTE" type="number" step="0.1" min="0" max="1.3" placeholder="0.0"
+            oninput="setGlobal('QTE', this.value)"
+            class="input-global w-full">
         </div>
+      </div>
     </div>
 
-    <script>
-        // --- Dados das Matérias ---
-        
-        // DSM 5 (Mantido original)
-        let materiasDSM5 = [
-            { id: 501, nome: "Segurança no Desenv. de Aplicações", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 502, nome: "Lab. de Desenv. Disp. Móveis (LDDM)", tipo: 'lddm', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 503, nome: "Prog. para Dispositivos Móveis II", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 504, nome: "Aprendizagem de Máquina", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 505, nome: "Computação em Nuvem I", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 506, nome: "Fundamentos da Redação Técnica", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } },
-            { id: 507, nome: "Inglês III", tipo: 'geral', notas: { AT1:'', AT2:'', AVI:'', PJI:'', MRT:'', LP:'', EXM:'' } }
-        ];
+    <!-- Aviso fórmula -->
+    <div id="formula-notice" class="bg-blue-50 border-b border-blue-100 px-4 py-2 text-xs text-blue-800 font-medium text-center leading-relaxed"></div>
 
-        // DSM 6 (Novo - Exclusivo)
-        let materiasDSM6 = [
-            { id: 601, nome: "Mineração de Dados", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
-            { id: 602, nome: "Lab. de Des. Multiplataforma", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
-            { id: 603, nome: "Qualidade e Testes de Software", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
-            { id: 604, nome: "Proc. de Linguagem Natural", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
-            { id: 605, nome: "Computação em Nuvem II", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
-            { id: 606, nome: "Ética Profissional e Patente", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } },
-            { id: 607, nome: "Inglês IV", notas: { AT1:'', AT2:'', AVI:'', PJI:'', EXM:'' } }
-        ];
+    <!-- Sub-tabs LP (DSM3/4/5) -->
+    <div id="lp-tabs" class="d-none flex border-b border-gray-200 bg-gray-50">
+      <button id="btn-geral" class="tab-lp active flex-1 py-3 text-sm font-medium text-gray-700" onclick="setLPMode('geral')">
+        <i class="fas fa-layer-group mr-1"></i> Disciplinas comuns (Fórmula 3)
+      </button>
+      <button id="btn-lp" class="tab-lp flex-1 py-3 text-sm font-medium text-gray-700" onclick="setLPMode('lp')">
+        <i class="fas fa-flask mr-1"></i> <span id="btn-lp-label">Disciplina-chave LP (Fórmula 4)</span>
+      </button>
+    </div>
 
-        // --- Configuração DSM 5 ---
-        const CONFIG_DSM5 = {
-            com_maratona: {
-                geral: { nome: "Padrão", weights: { AT1: 1, AT2: 1, AVI: 3, PJI: 3, MRT: 1, LP: 1 } },
-                lddm: { nome: "Laboratório (LDDM)", weights: { AT1: 0.5, AT2: 0.5, AVI: 3, PJI: 3, MRT: 1, LP: 2 } }
-            },
-            sem_maratona: {
-                geral: { nome: "Sem Maratona", weights: { AT1: 1.5, AT2: 1.5, AVI: 3, PJI: 3, LP: 1 } },
-                lddm: { nome: "Lab (Sem MRT)", weights: { AT1: 1, AT2: 1, AVI: 3, PJI: 3, LP: 2 } }
-            }
-        };
+    <!-- Contadores -->
+    <div class="grid grid-cols-3 divide-x divide-gray-100 bg-white">
+      <div class="p-3 text-center">
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Aprovadas</p>
+        <p id="cnt-ap" class="text-2xl font-bold text-green-600">0</p>
+      </div>
+      <div class="p-3 text-center">
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Exame</p>
+        <p id="cnt-ex" class="text-2xl font-bold text-yellow-600">0</p>
+      </div>
+      <div class="p-3 text-center">
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Reprovadas</p>
+        <p id="cnt-rp" class="text-2xl font-bold text-red-600">0</p>
+      </div>
+    </div>
+  </div>
 
-        // Estado Global
-        let semestreAtual = 5;
-        let modoDSM5 = 'com_maratona';
-        let valorQTEGlobal = 0;
+  <!-- Lista de matérias -->
+  <div id="lista" class="space-y-4"></div>
+</div>
 
-        // --- Funções de Controle ---
+<script>
+// ═══════════════════════════════════════════════
+// DISCIPLINAS
+// ═══════════════════════════════════════════════
+const DISC = {
+  1: [
+    { id:101, nome:'Técnicas de Programação' },
+    { id:102, nome:'Fundamentos de Redes de Computadores' },
+    { id:103, nome:'Engenharia de Software I' },
+    { id:104, nome:'Interface Web' },
+    { id:105, nome:'Fundamentos de Banco de Dados' },
+    { id:106, nome:'Matemática Computacional' },
+    { id:107, nome:'Inglês I' },
+  ],
+  2: [
+    { id:201, nome:'Desenvolvimento Web I' },
+    { id:202, nome:'Programação Orientada a Objetos' },
+    { id:203, nome:'Banco de Dados SQL' },
+    { id:204, nome:'Engenharia de Software II' },
+    { id:205, nome:'Redes de Computadores' },
+    { id:206, nome:'Análise Estatística e Qualidade' },
+    { id:207, nome:'Inglês II' },
+  ],
+  3: [
+    { id:301, nome:'Desenvolvimento Web II', lp:false },
+    { id:302, nome:'GAPS — Gerência de Projetos Ágeis e Soft Skills', lp:true },
+    { id:303, nome:'Banco de Dados NoSQL', lp:false },
+    { id:304, nome:'Programação para Dispositivos Móveis I', lp:false },
+    { id:305, nome:'Inteligência Artificial', lp:false },
+    { id:306, nome:'Computação em Nuvem I', lp:false },
+    { id:307, nome:'Inglês III', lp:false },
+  ],
+  4: [
+    { id:401, nome:'Desenvolvimento Web III', lp:false },
+    { id:402, nome:'LDW — Laboratório de Desenvolvimento Web', lp:true },
+    { id:403, nome:'Banco de Dados Avançado', lp:false },
+    { id:404, nome:'Segurança da Informação', lp:false },
+    { id:405, nome:'Programação para Dispositivos Móveis II', lp:false },
+    { id:406, nome:'Aprendizagem de Máquina', lp:false },
+    { id:407, nome:'Inglês IV', lp:false },
+  ],
+  5: [
+    { id:501, nome:'Segurança no Desenv. de Aplicações', lp:false },
+    { id:502, nome:'LDDM — Lab. de Desenv. Dispositivos Móveis', lp:true },
+    { id:503, nome:'Programação para Dispositivos Móveis III', lp:false },
+    { id:504, nome:'Aprendizagem de Máquina Avançada', lp:false },
+    { id:505, nome:'Computação em Nuvem II', lp:false },
+    { id:506, nome:'Fundamentos da Redação Técnica', lp:false },
+    { id:507, nome:'Inglês V', lp:false },
+  ],
+  6: [
+    { id:601, nome:'Mineração de Dados' },
+    { id:602, nome:'Lab. de Desenvolvimento Multiplataforma' },
+    { id:603, nome:'Qualidade e Testes de Software' },
+    { id:604, nome:'Processamento de Linguagem Natural' },
+    { id:605, nome:'Computação em Nuvem III' },
+    { id:606, nome:'Ética Profissional e Patente' },
+    { id:607, nome:'Inglês VI' },
+  ],
+};
 
-        function mudarSemestre(sem) {
-            semestreAtual = sem;
-            
-            // Atualiza UI das abas superiores
-            const tab5 = document.getElementById('tabSem5');
-            const tab6 = document.getElementById('tabSem6');
-            const headerTitle = document.getElementById('titulo-header');
-            const abasModoDSM5 = document.getElementById('abas-modo-dsm5');
-            const avisoDSM6 = document.getElementById('aviso-dsm6');
+const LP_NOME = { 3:'GAPS', 4:'LDW', 5:'LDDM' };
 
-            if (sem === 5) {
-                tab5.classList.add('active', 'bg-red-800', 'text-white');
-                tab5.classList.remove('bg-white', 'text-gray-700');
-                tab6.classList.remove('active', 'bg-red-800', 'text-white');
-                tab6.classList.add('bg-white', 'text-gray-700');
-                
-                headerTitle.innerText = "Boletim DSM 5";
-                abasModoDSM5.classList.remove('d-none');
-                avisoDSM6.classList.add('d-none');
-            } else {
-                tab6.classList.add('active', 'bg-red-800', 'text-white');
-                tab6.classList.remove('bg-white', 'text-gray-700');
-                tab5.classList.remove('active', 'bg-red-800', 'text-white');
-                tab5.classList.add('bg-white', 'text-gray-700');
-                
-                headerTitle.innerText = "Boletim DSM 6";
-                abasModoDSM5.classList.add('d-none');
-                avisoDSM6.classList.remove('d-none');
-            }
+// ═══════════════════════════════════════════════
+// PESOS — NDE-DSM-01/2025 (01/07/2025)
+// AT1 e AT2 entram individualmente; soma = (AT1+AT2) * pesoIndividual
+// que é equivalente a (AT1+AT2)/2 * pesoTotal na fórmula do SIGA
+// ═══════════════════════════════════════════════
+function getPesos(sem, isLPChave) {
+  if (sem === 1 || sem === 6) return { AT1:2,   AT2:2,   AVI:3, PJI:3 };
+  if (sem === 2)              return { AT1:1.5,  AT2:1.5, AVI:3, PJI:3, MRT:1 };
+  if (isLPChave)              return { AT1:0.5,  AT2:0.5, AVI:3, PJI:3, MRT:1, LP:2 };
+  return                             { AT1:1,    AT2:1,   AVI:3, PJI:3, MRT:1, LP:1 };
+}
 
-            renderLista();
-        }
+// ═══════════════════════════════════════════════
+// ESTADO GLOBAL
+// ═══════════════════════════════════════════════
+let semAtual  = 1;
+let lpMode    = 'geral';
+let globals   = { AVI:'', PJI:'', QTE:'' }; // globais de semestre
+let notas     = {}; // notas[id] = { AT1, AT2, MRT, LP, EXM }
 
-        function mudarModoDSM5(novoModo) {
-            modoDSM5 = novoModo;
-            document.getElementById('btnComMrt').className = `flex-1 py-3 text-sm font-medium text-gray-700 tab-btn ${novoModo === 'com_maratona' ? 'active' : ''}`;
-            document.getElementById('btnSemMrt').className = `flex-1 py-3 text-sm font-medium text-gray-700 tab-btn ${novoModo === 'sem_maratona' ? 'active' : ''}`;
-            renderLista();
-        }
+function init() {
+  [1,2,3,4,5,6].forEach(s => {
+    DISC[s].forEach(d => {
+      notas[d.id] = { AT1:'', AT2:'', MRT:'', LP:'', EXM:'' };
+    });
+  });
+  setSem(1);
+}
 
-        function atualizarQTEGlobal(valor) {
-            valorQTEGlobal = parseFloat(valor) || 0;
-            if (valorQTEGlobal > 1.3) valorQTEGlobal = 1.3;
-            
-            // Atualiza visual sem recriar DOM
-            const lista = semestreAtual === 5 ? materiasDSM5 : materiasDSM6;
-            lista.forEach(m => atualizarVisualMateria(m));
-            atualizarContadoresGlobais();
-        }
+// ═══════════════════════════════════════════════
+// GETTERS de valor (globais + por disciplina)
+// ═══════════════════════════════════════════════
+function gv(campo, id) {
+  // AVI, PJI, QTE → global; resto → por disciplina
+  if (['AVI','PJI','QTE'].includes(campo)) {
+    return parseFloat(globals[campo]) || 0;
+  }
+  return parseFloat(notas[id][campo]) || 0;
+}
 
-        function atualizarNota(id, campo, valor) {
-            const lista = semestreAtual === 5 ? materiasDSM5 : materiasDSM6;
-            const materia = lista.find(m => m.id === id);
-            
-            if (materia) {
-                materia.notas[campo] = valor;
-                atualizarVisualMateria(materia);
-                atualizarContadoresGlobais();
-            }
-        }
+function calcMP_raw(id, sem, isLPChave) {
+  const pesos = getPesos(sem, isLPChave);
+  let soma = 0;
+  for (const [campo, peso] of Object.entries(pesos)) {
+    soma += gv(campo, id) * peso;
+  }
+  return soma / 10;
+}
 
-        // --- Renderização ---
+// ═══════════════════════════════════════════════
+// NAVEGAÇÃO / ESTADO
+// ═══════════════════════════════════════════════
+function setSem(s) {
+  semAtual = s;
+  lpMode   = 'geral';
 
-        function renderLista() {
-            const container = document.getElementById('listaMaterias');
-            container.innerHTML = '';
-            
-            const lista = semestreAtual === 5 ? materiasDSM5 : materiasDSM6;
+  [1,2,3,4,5,6].forEach(i => {
+    document.getElementById('ts'+i).classList.toggle('active', i === s);
+  });
+  document.getElementById('hdr-title').textContent = 'Boletim DSM' + s;
 
-            lista.forEach(materia => {
-                let camposInputs = '';
-                let nomeTipo = '';
+  const notices = {
+    1: 'Fórmula 1 — MP = (4×((AT1+AT2)/2) + 3×AVI + 3×PJI) ÷ 10 + QTE',
+    2: 'Fórmula 2 — MP = (3×((AT1+AT2)/2) + 3×AVI + 3×PJI + 1×MRT) ÷ 10 + QTE',
+    3: 'Fórmula 3 — MP = (2×((AT1+AT2)/2) + 3×AVI + 3×PJI + 1×LP + 1×MRT) ÷ 10 + QTE   |   GAPS → Fórmula 4',
+    4: 'Fórmula 3 — MP = (2×((AT1+AT2)/2) + 3×AVI + 3×PJI + 1×LP + 1×MRT) ÷ 10 + QTE   |   LDW → Fórmula 4',
+    5: 'Fórmula 3 — MP = (2×((AT1+AT2)/2) + 3×AVI + 3×PJI + 1×LP + 1×MRT) ÷ 10 + QTE   |   LDDM → Fórmula 4',
+    6: 'Fórmula 1 — MP = (4×((AT1+AT2)/2) + 3×AVI + 3×PJI) ÷ 10 + QTE',
+  };
+  document.getElementById('formula-notice').textContent = notices[s];
 
-                // Lógica de Inputs baseada no Semestre
-                if (semestreAtual === 5) {
-                    const config = CONFIG_DSM5[modoDSM5][materia.tipo];
-                    nomeTipo = config.nome;
-                    camposInputs = gerarInputsDSM5(materia, config.weights);
-                } else {
-                    // DSM 6 fixo
-                    nomeTipo = "Padrão DSM 6";
-                    camposInputs = gerarInputsDSM6(materia);
-                }
+  const lpTabs = document.getElementById('lp-tabs');
+  if ([3,4,5].includes(s)) {
+    lpTabs.classList.remove('d-none');
+    document.getElementById('btn-lp-label').textContent = LP_NOME[s] + ' — Disciplina-chave LP (Fórmula 4)';
+    document.getElementById('btn-geral').classList.add('active');
+    document.getElementById('btn-lp').classList.remove('active');
+  } else {
+    lpTabs.classList.add('d-none');
+  }
 
-                // Template Card
-                const html = `
-                    <div id="card-${materia.id}" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden slide-down transition-all group">
-                        <!-- Header Card -->
-                        <div class="p-4 flex items-center justify-between border-b border-gray-100 bg-gray-50">
-                            <div class="flex items-center gap-3 overflow-hidden">
-                                <div id="barra-${materia.id}" class="w-1.5 h-12 rounded-full bg-gray-300 transition-colors"></div>
-                                <div>
-                                    <h3 class="font-bold text-gray-800 truncate w-40 md:w-auto text-sm md:text-base group-hover:text-red-900 transition-colors">${materia.nome}</h3>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <span class="text-[10px] uppercase font-bold tracking-wider text-gray-500 border border-gray-200 px-1.5 rounded bg-white">${nomeTipo}</span>
-                                        <span id="badge-qte-${materia.id}" class="hidden text-[10px] text-blue-600 bg-blue-50 px-1 rounded border border-blue-100 font-bold"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] font-bold text-gray-400 uppercase">Média</p>
-                                <p id="media-texto-${materia.id}" class="text-2xl font-bold text-gray-400">-</p>
-                            </div>
-                        </div>
+  renderLista();
+}
 
-                        <!-- Corpo Inputs -->
-                        <div class="block bg-white p-4">
-                            <div class="grid grid-cols-3 md:grid-cols-6 gap-3 mb-4">
-                                ${camposInputs}
-                            </div>
+function setLPMode(mode) {
+  lpMode = mode;
+  document.getElementById('btn-geral').classList.toggle('active', mode === 'geral');
+  document.getElementById('btn-lp').classList.toggle('active', mode === 'lp');
+  renderLista();
+}
 
-                            <!-- Exame -->
-                            <div id="box-exame-${materia.id}" class="d-none flex flex-col md:flex-row gap-4 mt-4 bg-yellow-50 p-3 rounded-lg border border-yellow-200 shadow-sm">
-                                <div class="flex-1">
-                                    <label class="text-[10px] font-bold text-yellow-800 flex items-center gap-1 mb-1 uppercase tracking-wider">
-                                        <i class="fas fa-exclamation-circle"></i> Exame Final Necessário
-                                    </label>
-                                    <div class="flex gap-2 items-center">
-                                        <input type="number" step="0.1" min="0" max="10" 
-                                            value="${materia.notas.EXM}" 
-                                            oninput="atualizarNota(${materia.id}, 'EXM', this.value)"
-                                            class="w-full p-2 text-sm border border-yellow-300 rounded focus:border-yellow-500 outline-none bg-white font-bold text-yellow-900" placeholder="Nota Exame">
-                                        <span id="mp-info-${materia.id}" class="text-xs font-bold text-yellow-700 whitespace-nowrap"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Footer Status -->
-                            <div id="footer-status-${materia.id}" class="d-none mt-3 flex justify-between items-end border-t border-gray-100 pt-2">
-                                <span id="detalhe-${materia.id}" class="text-[10px] font-mono text-gray-400"></span>
-                                <div id="msg-final-${materia.id}" class="font-bold text-sm"></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += html;
-                atualizarVisualMateria(materia);
-            });
+function setGlobal(campo, val) {
+  if (campo === 'QTE') {
+    val = Math.min(1.3, Math.max(0, parseFloat(val) || 0)).toString();
+  }
+  globals[campo] = val;
+  // propaga para os inputs read-only de cada card
+  DISC[semAtual].forEach(d => {
+    const el = document.getElementById(`ro-${campo}-${d.id}`);
+    if (el) el.value = val !== '' ? parseFloat(val).toFixed(1) : '';
+    recalc(d.id);
+  });
+  updateContadores();
+}
 
-            atualizarContadoresGlobais();
-        }
+function setNota(id, campo, val) {
+  notas[id][campo] = val;
+  recalc(id);
+  updateContadores();
+}
 
-        function gerarInputsDSM5(materia, weights) {
-            return Object.keys(weights).map(campo => `
-                <div class="relative group-input">
-                    <label class="block text-[10px] font-bold text-gray-500 mb-1 text-center">${campo} <span class="text-gray-300 font-normal ml-0.5 text-[9px] bg-gray-100 px-1 rounded">x${weights[campo]}</span></label>
-                    <input type="number" step="0.1" min="0" max="10" 
-                        value="${materia.notas[campo] || ''}" 
-                        oninput="atualizarNota(${materia.id}, '${campo}', this.value)"
-                        class="w-full p-2.5 text-center text-sm font-bold text-gray-700 border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-200 focus:border-red-500 outline-none bg-gray-50 focus:bg-white placeholder-gray-200 transition-all shadow-sm hover:border-gray-300" placeholder="-">
-                </div>
-            `).join('');
-        }
+// ═══════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════
+function renderLista() {
+  const container = document.getElementById('lista');
+  container.innerHTML = '';
 
-        function gerarInputsDSM6(materia) {
-            // Campos fixos DSM 6: AT1, AT2, AVI, PJI
-            const campos = ['AT1', 'AT2', 'AVI', 'PJI'];
-            return campos.map(campo => `
-                <div class="relative group-input">
-                    <label class="block text-[10px] font-bold text-gray-500 mb-1 text-center">${campo}</label>
-                    <input type="number" step="0.1" min="0" max="10" 
-                        value="${materia.notas[campo] || ''}" 
-                        oninput="atualizarNota(${materia.id}, '${campo}', this.value)"
-                        class="w-full p-2.5 text-center text-sm font-bold text-gray-700 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-200 focus:border-blue-500 outline-none bg-gray-50 focus:bg-white placeholder-gray-200 transition-all shadow-sm hover:border-gray-300" placeholder="-">
-                </div>
-            `).join('');
-        }
+  DISC[semAtual].forEach(d => {
+    const isLPChave = [3,4,5].includes(semAtual) && d.lp === true;
+    const useLP     = [3,4,5].includes(semAtual) && lpMode === 'lp' && isLPChave;
+    const avisoLP   = isLPChave && lpMode === 'geral';
+    const pesos     = getPesos(semAtual, useLP);
 
-        // --- Cálculos ---
+    let fBadge = semAtual === 2 ? 'Fórmula 2'
+               : ([3,4,5].includes(semAtual) && useLP) ? 'Fórmula 4 — LP-chave'
+               : [3,4,5].includes(semAtual) ? 'Fórmula 3'
+               : 'Fórmula 1';
 
-        function calcularStatus(materia) {
-            let mediaBase = 0;
-            let n = materia.notas;
+    // Campos editáveis por disciplina: AT1, AT2, MRT (se existir), LP (se existir)
+    // AVI, PJI, QTE → read-only vindos do global
+    const inputsHTML = Object.entries(pesos).map(([campo, peso]) => {
+      const isGlobal = ['AVI','PJI','QTE'].includes(campo);
+      const isOpt    = campo === 'MRT' || campo === 'LP';
+      const gVal     = globals[campo] !== '' ? parseFloat(globals[campo]).toFixed(1) : '';
 
-            // Lógica de Cálculo
-            if (semestreAtual === 5) {
-                // Cálculo DSM 5 (Ponderada)
-                const weights = CONFIG_DSM5[modoDSM5][materia.tipo].weights;
-                let soma = 0;
-                Object.keys(weights).forEach(campo => {
-                    soma += (parseFloat(n[campo]) || 0) * weights[campo];
-                });
-                mediaBase = soma / 10;
-            } else {
-                // Cálculo DSM 6 (Fórmula Específica)
-                // Fórmula: ((((4.0*((AT1+AT2)/2))+(3.0*AVI)+(3.0*PJI))/10)
-                let at1 = parseFloat(n.AT1) || 0;
-                let at2 = parseFloat(n.AT2) || 0;
-                let avi = parseFloat(n.AVI) || 0;
-                let pji = parseFloat(n.PJI) || 0;
+      if (isGlobal) {
+        // Read-only — espelho do global
+        return `
+          <div>
+            <label class="block text-[10px] font-bold mb-1 text-center text-indigo-500">
+              ${campo}
+              <span class="text-[9px] font-normal px-1 rounded text-indigo-400 bg-indigo-50">×${peso}</span>
+            </label>
+            <input id="ro-${campo}-${d.id}" type="number" step="0.1"
+              value="${gVal}" readonly tabindex="-1"
+              class="input-global-readonly w-full"
+              title="Definido no painel acima">
+          </div>`;
+      }
 
-                let mediaATs = (at1 + at2) / 2;
-                let termo1 = 4.0 * mediaATs;
-                let termo2 = 3.0 * avi;
-                let termo3 = 3.0 * pji;
+      const val = notas[d.id][campo] || '';
+      return `
+        <div>
+          <label class="block text-[10px] font-bold mb-1 text-center ${isOpt ? 'text-gray-400' : 'text-gray-500'}">
+            ${campo}
+            <span class="text-[9px] font-normal px-1 rounded ${isOpt ? 'text-gray-400 bg-gray-100' : 'text-red-400 bg-red-50'}">×${peso}</span>
+          </label>
+          <input type="number" step="0.1" min="0" max="10" placeholder="—" value="${val}"
+            oninput="setNota(${d.id},'${campo}',this.value)"
+            class="input-nota">
+        </div>`;
+    }).join('');
 
-                mediaBase = (termo1 + termo2 + termo3) / 10;
-            }
+    const ncols = Object.keys(pesos).length;
+    const gridCols = Math.min(ncols, 6);
 
-            // Lógica Comum de Aprovação
-            let mp = mediaBase + valorQTEGlobal;
-            if (mp > 10) mp = 10.0;
-            
-            const mpSemExame = mp.toFixed(1);
+    const avisLPHtml = avisoLP ? `
+      <div class="mt-3 text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 flex items-start gap-2">
+        <i class="fas fa-triangle-exclamation mt-0.5 flex-shrink-0"></i>
+        <span>Esta é a disciplina-chave <strong>${LP_NOME[semAtual]}</strong>. Use a aba
+        "<strong>${LP_NOME[semAtual]} — Disciplina-chave LP (Fórmula 4)</strong>" acima para calcular com os pesos corretos.</span>
+      </div>` : '';
 
-            let resultado = {
-                notaFinal: mpSemExame,
-                mpSemExame: mpSemExame,
-                codigo: '',
-                corBarra: '',
-                corTexto: '',
-                precisaExame: false,
-                detalhe: `(Média ${mediaBase.toFixed(1)} + QTE ${valorQTEGlobal})`,
-                mensagemFinal: ''
-            };
+    container.innerHTML += `
+      <div id="card-${d.id}" class="bg-white rounded-xl shadow-sm border ${avisoLP ? 'border-amber-300' : 'border-gray-200'} overflow-hidden fade-in">
 
-            // Regras de Corte
-            if (mp >= 6.0) {
-                resultado.codigo = 'APROVADO';
-                resultado.corBarra = 'bg-green-500';
-                resultado.corTexto = 'text-green-600';
-                resultado.mensagemFinal = 'Aprovado Direto';
-            } else if (mp < 2.0) { // Nota: Regras da Fatec geralmente reprovam direto < 2? Se não, remova este bloco. Mantendo lógica do seu código anterior.
-                // Se o DSM 6 tiver regra diferente para reprovação direta, ajuste aqui.
-                // Assumindo padrão Fatec (Geralmente vai pra exame se >= ? mas seu código original tinha < 2)
-                resultado.codigo = 'REPROVADO';
-                resultado.corBarra = 'bg-red-500';
-                resultado.corTexto = 'text-red-600';
-                resultado.mensagemFinal = 'Reprovado Direto';
-            } else {
-                resultado.codigo = 'EXAME';
-                resultado.corBarra = 'bg-yellow-500';
-                resultado.corTexto = 'text-yellow-600';
-                resultado.precisaExame = true;
-                resultado.mensagemFinal = 'Aguardando Exame';
+        <!-- Header card -->
+        <div class="p-4 flex items-center justify-between border-b border-gray-100 bg-gray-50/70">
+          <div class="flex items-center gap-3 min-w-0 flex-1">
+            <div id="barra-${d.id}" class="flex-shrink-0 w-1.5 h-12 rounded-full bg-gray-200 transition-colors duration-300"></div>
+            <div class="min-w-0">
+              <h3 class="font-bold text-gray-800 text-sm leading-snug">${d.nome}</h3>
+              <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                <span class="text-[10px] uppercase font-bold tracking-wider text-gray-500 border border-gray-200 px-1.5 py-0.5 rounded bg-white">${fBadge}</span>
+              </div>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0 ml-3">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Média</p>
+            <p id="media-${d.id}" class="text-3xl font-bold text-gray-300 tabular-nums">—</p>
+          </div>
+        </div>
 
-                // Cálculo Pós Exame
-                if (n.EXM !== undefined && n.EXM !== '' && n.EXM !== 0) {
-                    const exm = parseFloat(n.EXM);
-                    // Fórmula Fatec Exame: (Média + Exame) / 2
-                    let mf = (mp + exm) / 2;
-                    
-                    // Se MF < MP, prevalece MP? Geralmente não na média final, mas na lógica de sistema sim.
-                    // Mantendo sua lógica original:
-                    if (mf < mp) mf = mp;
+        <!-- Inputs -->
+        <div class="p-4">
+          <div class="grid gap-2.5 mb-2" style="grid-template-columns: repeat(${gridCols}, minmax(0,1fr))">
+            ${inputsHTML}
+          </div>
+          ${avisLPHtml}
 
-                    resultado.notaFinal = mf.toFixed(1);
-                    resultado.detalhe = `(MP ${mp.toFixed(1)} + EXM ${exm.toFixed(1)}) / 2`;
+          <!-- Box Exame -->
+          <div id="box-exame-${d.id}" class="d-none mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+              <div class="flex-1">
+                <label class="text-[10px] font-bold text-yellow-800 uppercase tracking-wider flex items-center gap-1 mb-1.5">
+                  <i class="fas fa-exclamation-circle"></i> Exame final necessário
+                </label>
+                <input type="number" step="0.1" min="0" max="10" placeholder="Nota do exame"
+                  value="${notas[d.id].EXM || ''}"
+                  oninput="setNota(${d.id},'EXM',this.value)"
+                  class="w-full sm:w-36 p-2 text-sm border border-yellow-300 rounded-lg focus:border-yellow-500 outline-none bg-white font-bold text-yellow-900">
+              </div>
+              <div id="mp-info-${d.id}" class="text-sm font-bold text-yellow-700 sm:mt-4"></div>
+            </div>
+          </div>
 
-                    if (mf >= 6.0) {
-                        resultado.codigo = 'APROVADO';
-                        resultado.corBarra = 'bg-green-500';
-                        resultado.corTexto = 'text-green-600';
-                        resultado.mensagemFinal = 'Aprovado no Exame';
-                    } else {
-                        resultado.codigo = 'REPROVADO';
-                        resultado.corBarra = 'bg-red-500';
-                        resultado.corTexto = 'text-red-600';
-                        resultado.mensagemFinal = 'Reprovado no Exame';
-                    }
-                }
-            }
-            return resultado;
-        }
+          <!-- Footer -->
+          <div id="footer-${d.id}" class="d-none mt-3 flex justify-between items-center border-t border-gray-100 pt-2 gap-2">
+            <span id="detalhe-${d.id}" class="text-[10px] font-mono text-gray-400 leading-relaxed"></span>
+            <span id="status-txt-${d.id}" class="text-sm font-bold flex-shrink-0"></span>
+          </div>
+        </div>
+      </div>`;
+  });
 
-        // --- Atualização Visual ---
+  DISC[semAtual].forEach(d => recalc(d.id));
+  updateContadores();
+}
 
-        function atualizarVisualMateria(materia) {
-            const status = calcularStatus(materia);
-            const temNota = Object.values(materia.notas).some(v => v !== '' && v !== 0 && v !== undefined);
-            const ativo = valorQTEGlobal > 0 || temNota;
+// ═══════════════════════════════════════════════
+// CÁLCULO E VISUAL
+// ═══════════════════════════════════════════════
+function useFormula4(d) {
+  return [3,4,5].includes(semAtual) && lpMode === 'lp' && d.lp === true;
+}
 
-            const elBarra = document.getElementById(`barra-${materia.id}`);
-            const elMedia = document.getElementById(`media-texto-${materia.id}`);
-            const elBadgeQte = document.getElementById(`badge-qte-${materia.id}`);
-            const elBoxExame = document.getElementById(`box-exame-${materia.id}`);
-            const elMpInfo = document.getElementById(`mp-info-${materia.id}`);
-            const elFooter = document.getElementById(`footer-status-${materia.id}`);
-            const elDetalhe = document.getElementById(`detalhe-${materia.id}`);
-            const elMsgFinal = document.getElementById(`msg-final-${materia.id}`);
+function hasAnyInput(id) {
+  const n = notas[id];
+  const localFilled = Object.entries(n).some(([k,v]) => k !== 'EXM' && v !== '');
+  const globalFilled = globals.AVI !== '' || globals.PJI !== '' || globals.QTE !== '';
+  return localFilled || globalFilled;
+}
 
-            if (!elBarra) return;
+function recalc(id) {
+  const d = DISC[semAtual].find(x => x.id === id);
+  if (!d) return;
 
-            if (ativo) {
-                elBarra.className = `w-1.5 h-12 rounded-full transition-colors ${status.corBarra}`;
-                elMedia.className = `text-2xl font-bold ${status.corTexto}`;
-                elMedia.innerText = status.notaFinal;
-            } else {
-                elBarra.className = `w-1.5 h-12 rounded-full bg-gray-300 transition-colors`;
-                elMedia.className = `text-2xl font-bold text-gray-400`;
-                elMedia.innerText = '-';
-            }
+  const useLP = useFormula4(d);
+  const n     = notas[id];
 
-            if (valorQTEGlobal > 0) {
-                elBadgeQte.innerText = `+${valorQTEGlobal} QTE`;
-                elBadgeQte.classList.remove('hidden');
-            } else {
-                elBadgeQte.classList.add('hidden');
-            }
+  const barra     = document.getElementById('barra-'+id);
+  const mediaEl   = document.getElementById('media-'+id);
+  const boxExame  = document.getElementById('box-exame-'+id);
+  const mpInfoEl  = document.getElementById('mp-info-'+id);
+  const footerEl  = document.getElementById('footer-'+id);
+  const detalheEl = document.getElementById('detalhe-'+id);
+  const statusEl  = document.getElementById('status-txt-'+id);
 
-            if (status.precisaExame) {
-                elBoxExame.classList.remove('d-none');
-                elMpInfo.innerText = `MP: ${status.mpSemExame}`;
-            } else {
-                elBoxExame.classList.add('d-none');
-            }
+  if (!barra) return;
 
-            if (ativo) {
-                elFooter.classList.remove('d-none');
-                elDetalhe.innerText = status.detalhe;
-                elMsgFinal.innerText = status.mensagemFinal;
-                elMsgFinal.className = `font-bold text-sm ${status.corTexto}`;
-            } else {
-                elFooter.classList.add('d-none');
-            }
-        }
+  // Se nenhum campo foi tocado ainda, fica em branco
+  if (!hasAnyInput(id)) {
+    barra.className     = 'flex-shrink-0 w-1.5 h-12 rounded-full bg-gray-200 transition-colors duration-300';
+    mediaEl.className   = 'text-3xl font-bold text-gray-300 tabular-nums';
+    mediaEl.textContent = '—';
+    boxExame.classList.add('d-none');
+    footerEl.classList.add('d-none');
+    return;
+  }
 
-        function atualizarContadoresGlobais() {
-            let aprovadas = 0, exame = 0, reprovadas = 0;
-            const lista = semestreAtual === 5 ? materiasDSM5 : materiasDSM6;
+  const qteVal = Math.min(1.3, parseFloat(globals.QTE) || 0);
+  const mp_raw = calcMP_raw(id, semAtual, useLP);
+  const mp     = Math.min(10, mp_raw + qteVal);
+  const exm    = parseFloat(n.EXM);
 
-            lista.forEach(materia => {
-                const status = calcularStatus(materia);
-                const temNota = Object.values(materia.notas).some(v => v !== '' && v !== 0 && v !== undefined);
-                const ativo = valorQTEGlobal > 0 || temNota;
+  let notaFinal  = mp;
+  let statusCode = '';
+  let statusMsg  = '';
+  let cor        = '';
+  let detalheStr = `MP base: ${mp_raw.toFixed(2)} + QTE: ${qteVal.toFixed(1)} = ${mp.toFixed(2)}`;
 
-                if (ativo) {
-                    if (status.codigo === 'APROVADO') aprovadas++;
-                    else if (status.codigo === 'EXAME') exame++;
-                    else if (status.codigo === 'REPROVADO') reprovadas++;
-                }
-            });
+  if (mp >= 6) {
+    statusCode = 'AP'; statusMsg = 'Aprovado direto ✓'; cor = 'green';
+  } else if (mp < 2) {
+    statusCode = 'RP'; statusMsg = 'Reprovado (MP < 2)'; cor = 'red';
+  } else {
+    statusCode = 'EX'; statusMsg = 'Aguardando exame'; cor = 'yellow';
+    if (!isNaN(exm)) {
+      const mf_calc = (mp + exm) / 2;
+      notaFinal = Math.min(10, mf_calc < mp ? mp : mf_calc);
+      detalheStr = `MF = (MP ${mp.toFixed(2)} + EXM ${exm.toFixed(2)}) / 2 = ${notaFinal.toFixed(2)}`;
+      if (notaFinal >= 6) {
+        statusCode = 'AP'; statusMsg = 'Aprovado no exame ✓'; cor = 'green';
+      } else {
+        statusCode = 'RP'; statusMsg = 'Reprovado no exame'; cor = 'red';
+      }
+    }
+  }
 
-            document.getElementById('countAprovadas').innerText = aprovadas;
-            document.getElementById('countExame').innerText = exame;
-            document.getElementById('countReprovadas').innerText = reprovadas;
-        }
+  const barraMap = { green:'bg-green-500', yellow:'bg-yellow-500', red:'bg-red-500' };
+  const textMap  = { green:'text-green-600', yellow:'text-yellow-600', red:'text-red-600' };
 
-        // Inicializar com DSM 5
-        mudarSemestre(5);
-    </script>
+  barra.className   = `flex-shrink-0 w-1.5 h-12 rounded-full transition-colors duration-300 ${barraMap[cor]}`;
+  mediaEl.className = `text-3xl font-bold tabular-nums ${textMap[cor]}`;
+  mediaEl.textContent = notaFinal.toFixed(1);
+
+  if (mp >= 2 && mp < 6) {
+    boxExame.classList.remove('d-none');
+    mpInfoEl.textContent = `MP = ${mp.toFixed(2)}`;
+  } else {
+    boxExame.classList.add('d-none');
+  }
+
+  footerEl.classList.remove('d-none');
+  detalheEl.textContent = detalheStr;
+  statusEl.textContent  = statusMsg;
+  statusEl.className    = `text-sm font-bold flex-shrink-0 ${textMap[cor]}`;
+}
+
+function updateContadores() {
+  let ap = 0, ex = 0, rp = 0;
+  DISC[semAtual].forEach(d => {
+    if (!hasAnyInput(d.id)) return;
+    const useLP  = useFormula4(d);
+    const qteVal = Math.min(1.3, parseFloat(globals.QTE) || 0);
+    const mp_raw = calcMP_raw(d.id, semAtual, useLP);
+    const mp     = Math.min(10, mp_raw + qteVal);
+    const exm    = parseFloat(notas[d.id].EXM);
+
+    if (mp >= 6)  { ap++; return; }
+    if (mp < 2)   { rp++; return; }
+    if (!isNaN(exm)) {
+      const mf = Math.min(10, Math.max(mp, (mp + exm) / 2));
+      if (mf >= 6) ap++; else rp++;
+    } else {
+      ex++;
+    }
+  });
+  document.getElementById('cnt-ap').textContent = ap;
+  document.getElementById('cnt-ex').textContent = ex;
+  document.getElementById('cnt-rp').textContent = rp;
+}
+
+init();
+</script>
 </body>
 </html>
