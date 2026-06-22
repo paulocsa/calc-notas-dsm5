@@ -6,6 +6,7 @@
 <title>Boletim DSM — Fatec Registro</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
   body { font-family: 'Inter', sans-serif; }
@@ -64,6 +65,10 @@
           <i class="fas fa-calculator"></i>
           <span id="hdr-title">Boletim DSM1</span>
         </h1>
+        <button id="btn-salvar" onclick="salvarImagem()"
+          class="flex items-center gap-1.5 bg-red-800 hover:bg-red-700 active:bg-red-950 text-white text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          <i class="fas fa-camera"></i> Salvar imagem
+        </button>
       </div>
       <!-- Campos globais -->
       <div class="grid grid-cols-3 gap-3">
@@ -536,6 +541,37 @@ function updateContadores() {
   document.getElementById('cnt-ap').textContent = ap;
   document.getElementById('cnt-ex').textContent = ex;
   document.getElementById('cnt-rp').textContent = rp;
+}
+
+// ═══════════════════════════════════════════════
+// SALVAR COMO IMAGEM
+// ═══════════════════════════════════════════════
+function salvarImagem() {
+  const btn   = document.getElementById('btn-salvar');
+  const lista = document.getElementById('lista');
+
+  btn.disabled    = true;
+  btn.innerHTML   = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
+
+  html2canvas(lista, {
+    backgroundColor: '#f3f4f6',
+    scale: 2,
+    useCORS: true,
+    logging: false,
+    onclone: (doc) => {
+      doc.querySelectorAll('#lista input').forEach(inp => {
+        inp.setAttribute('value', inp.value);
+      });
+    },
+  }).then(canvas => {
+    const link      = document.createElement('a');
+    link.download   = `boletim-dsm${semAtual}.png`;
+    link.href       = canvas.toDataURL('image/png');
+    link.click();
+  }).finally(() => {
+    btn.disabled  = false;
+    btn.innerHTML = '<i class="fas fa-camera"></i> Salvar imagem';
+  });
 }
 
 init();
