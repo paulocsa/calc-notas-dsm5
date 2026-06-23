@@ -29,7 +29,7 @@
   .input-nota::placeholder { color:#d1d5db; }
   .input-global {
     width:60px; padding:6px 4px; text-align:center; font-size:14px; font-weight:700;
-    color:#1f2937; border-radius:6px; border:none; outline:none;
+    border-radius:6px; border:none; outline:none;
     background:rgba(255,255,255,0.15); color:#fff;
     transition:all .15s;
   }
@@ -70,34 +70,33 @@
           <i class="fas fa-camera"></i> Salvar imagem
         </button>
       </div>
-      <!-- Campos globais -->
       <div class="grid grid-cols-3 gap-3">
-        <!-- AVI -->
         <div class="bg-red-800 rounded-xl p-3 border border-red-700">
           <p class="text-[10px] font-bold text-red-200 uppercase tracking-wider mb-1.5 flex items-center gap-1">
             <i class="fas fa-file-alt"></i> AVI <span class="font-normal normal-case text-red-300 ml-1">— mesma p/ todos</span>
           </p>
-          <input id="globalAVI" type="number" step="0.1" min="0" max="10" placeholder="0.0"
+          <input id="globalAVI" type="text" inputmode="decimal" placeholder="0,00"
             oninput="setGlobal('AVI', this.value)"
-            class="input-global w-full">
+            onblur="blurGlobal('AVI', this)"
+            class="input-global w-full" autocomplete="off">
         </div>
-        <!-- PJI -->
         <div class="bg-red-800 rounded-xl p-3 border border-red-700">
           <p class="text-[10px] font-bold text-red-200 uppercase tracking-wider mb-1.5 flex items-center gap-1">
             <i class="fas fa-project-diagram"></i> PJI <span class="font-normal normal-case text-red-300 ml-1">— mesma p/ todos</span>
           </p>
-          <input id="globalPJI" type="number" step="0.1" min="0" max="10" placeholder="0.0"
+          <input id="globalPJI" type="text" inputmode="decimal" placeholder="0,00"
             oninput="setGlobal('PJI', this.value)"
-            class="input-global w-full">
+            onblur="blurGlobal('PJI', this)"
+            class="input-global w-full" autocomplete="off">
         </div>
-        <!-- QTE -->
         <div class="bg-red-800 rounded-xl p-3 border border-red-700">
           <p class="text-[10px] font-bold text-red-200 uppercase tracking-wider mb-1.5 flex items-center gap-1">
             <i class="fas fa-certificate"></i> QTE <span class="font-normal normal-case text-red-300 ml-1">— bônus 0–1,3</span>
           </p>
-          <input id="globalQTE" type="number" step="0.1" min="0" max="1.3" placeholder="0.0"
+          <input id="globalQTE" type="text" inputmode="decimal" placeholder="0,00"
             oninput="setGlobal('QTE', this.value)"
-            class="input-global w-full">
+            onblur="blurGlobal('QTE', this)"
+            class="input-global w-full" autocomplete="off">
         </div>
       </div>
     </div>
@@ -134,75 +133,423 @@
 
   <!-- Lista de matérias -->
   <div id="lista" class="space-y-4"></div>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- LEGENDA DAS FÓRMULAS                        -->
+  <!-- ═══════════════════════════════════════════ -->
+  <div class="mt-8 bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+
+    <!-- Header -->
+    <div class="bg-gray-800 px-5 py-4 flex items-center gap-3">
+      <i class="fas fa-book-open text-gray-300 text-lg"></i>
+      <div>
+        <h2 class="text-white font-bold text-base">Legenda e Fórmulas — NDE-DSM-01/2025</h2>
+        <p class="text-gray-400 text-xs mt-0.5">Referência oficial do Núcleo Docente Estruturante · Fatec Registro</p>
+      </div>
+    </div>
+
+    <div class="p-5 space-y-6">
+
+      <!-- VARIÁVEIS -->
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
+          <i class="fas fa-tags text-gray-400"></i> Variáveis de avaliação
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+
+          <div class="flex gap-3 p-3 bg-red-50 border border-red-100 rounded-xl">
+            <span class="flex-shrink-0 w-10 h-10 bg-red-800 text-white rounded-lg flex items-center justify-center font-bold text-sm">AT1</span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Atividades do 1º Bimestre</p>
+              <p class="text-xs text-gray-500 mt-0.5">Média das atividades ofertadas no bimestre (máx. 5 atividades). Nota consultada diretamente com o docente.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-3 p-3 bg-red-50 border border-red-100 rounded-xl">
+            <span class="flex-shrink-0 w-10 h-10 bg-red-800 text-white rounded-lg flex items-center justify-center font-bold text-sm">AT2</span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Atividades do 2º Bimestre</p>
+              <p class="text-xs text-gray-500 mt-0.5">Idem AT1, referente ao 2º bimestre. Nas fórmulas, AT1 e AT2 são sempre combinados como <strong>(AT1+AT2)/2</strong>.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-3 p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
+            <span class="flex-shrink-0 w-10 h-10 bg-indigo-700 text-white rounded-lg flex items-center justify-center font-bold text-sm">AVI</span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Avaliação Integradora</p>
+              <p class="text-xs text-gray-500 mt-0.5">Prova interdisciplinar aplicada a todas as disciplinas do semestre simultaneamente. <strong>Mesma nota para todas as matérias.</strong> Desc. 1: 30 questões obj. (peso 3) + 6 disc. (peso 3) + 6 práticas (peso 4). Nota mín. para integração: 6.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-3 p-3 bg-indigo-50 border border-indigo-100 rounded-xl">
+            <span class="flex-shrink-0 w-10 h-10 bg-indigo-700 text-white rounded-lg flex items-center justify-center font-bold text-sm">PJI</span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Projeto Integrador</p>
+              <p class="text-xs text-gray-500 mt-0.5">Projeto de extensão em formato de artigo científico (normas ABNT), avaliado por banca técnica (UX/UI, front-end, back-end, metas, artigo). <strong>Mesma nota para todas as matérias.</strong></p>
+            </div>
+          </div>
+
+          <div class="flex gap-3 p-3 bg-amber-50 border border-amber-100 rounded-xl">
+            <span class="flex-shrink-0 w-10 h-10 bg-amber-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">MRT</span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Maratona de Programação</p>
+              <p class="text-xs text-gray-500 mt-0.5">5 a 10 questões práticas resolvidas em equipe. Presente no DSM2, DSM3, DSM4 e DSM5. <strong>Mesma equipe do PJI.</strong></p>
+            </div>
+          </div>
+
+          <div class="flex gap-3 p-3 bg-amber-50 border border-amber-100 rounded-xl">
+            <span class="flex-shrink-0 w-10 h-10 bg-amber-600 text-white rounded-lg flex items-center justify-center font-bold text-sm">LP</span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Laboratório de Práticas</p>
+              <p class="text-xs text-gray-500 mt-0.5">4 equipes por semestre trabalhando no mesmo produto. Presente no DSM3, DSM4 e DSM5. A disciplina-chave (GAPS/LDW/LDDM) usa peso <strong>2</strong>; as demais usam peso <strong>1</strong>.</p>
+            </div>
+          </div>
+
+          <div class="flex gap-3 p-3 bg-green-50 border border-green-100 rounded-xl">
+            <span class="flex-shrink-0 w-10 h-10 bg-green-700 text-white rounded-lg flex items-center justify-center font-bold text-xs leading-tight text-center">QTE</span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Qualificações Técnicas Extracurriculares</p>
+              <p class="text-xs text-gray-500 mt-0.5"><strong>Bônus</strong> de 0 a 1,3 pontos somado à MP. Facultativo. Acumulado por cursos e atividades externas. <strong>Mesma nota para todas as matérias.</strong></p>
+            </div>
+          </div>
+
+          <div class="flex gap-3 p-3 bg-yellow-50 border border-yellow-100 rounded-xl">
+            <span class="flex-shrink-0 w-10 h-10 bg-yellow-500 text-white rounded-lg flex items-center justify-center font-bold text-sm">EXM</span>
+            <div>
+              <p class="font-bold text-gray-800 text-sm">Exame Final</p>
+              <p class="text-xs text-gray-500 mt-0.5">Disponível apenas para quem obtiver MP <strong>≥ 2 e &lt; 6</strong>. 2 questões teórico-discursivas (peso 5) + 2 práticas (peso 5). MF = (MP + EXM) / 2. A MP se mantém se MF &lt; MP.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- DIVISOR -->
+      <hr class="border-gray-100">
+
+      <!-- FÓRMULAS -->
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
+          <i class="fas fa-function text-gray-400"></i> Fórmulas de cálculo da Média Parcial (MP)
+        </h3>
+
+        <div class="space-y-3">
+
+          <!-- F1 -->
+          <div class="rounded-xl border border-gray-200 overflow-hidden">
+            <div class="bg-gray-700 px-4 py-2.5 flex items-center justify-between">
+              <span class="text-white font-bold text-sm flex items-center gap-2">
+                <span class="bg-white text-gray-800 text-xs font-black px-2 py-0.5 rounded">F1</span>
+                DSM1 e DSM6
+              </span>
+              <span class="text-gray-400 text-xs">6 disciplinas cada</span>
+            </div>
+            <div class="p-4 bg-gray-50">
+              <div class="font-mono text-sm text-gray-800 bg-white border border-gray-200 rounded-lg px-4 py-3 mb-3 overflow-x-auto whitespace-nowrap">
+                MP = ( 4 × <span class="text-red-600 font-bold">(AT1+AT2)/2</span> + 3 × <span class="text-indigo-600 font-bold">AVI</span> + 3 × <span class="text-indigo-600 font-bold">PJI</span> ) ÷ 10 + <span class="text-green-600 font-bold">QTE</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-center">
+                <div class="bg-red-50 border border-red-100 rounded-lg p-2"><span class="font-bold text-red-700">(AT1+AT2)/2</span><br><span class="text-gray-500">peso 4</span></div>
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-2"><span class="font-bold text-indigo-700">AVI</span><br><span class="text-gray-500">peso 3</span></div>
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-2"><span class="font-bold text-indigo-700">PJI</span><br><span class="text-gray-500">peso 3</span></div>
+                <div class="bg-green-50 border border-green-100 rounded-lg p-2"><span class="font-bold text-green-700">QTE</span><br><span class="text-gray-500">bônus +0 a +1,3</span></div>
+              </div>
+              <p class="text-xs text-gray-400 mt-2">Soma dos pesos: 4+3+3 = <strong>10</strong> · MP máxima sem QTE: 10,0 · Com QTE máxima: cap 10,0</p>
+            </div>
+          </div>
+
+          <!-- F2 -->
+          <div class="rounded-xl border border-gray-200 overflow-hidden">
+            <div class="bg-gray-700 px-4 py-2.5 flex items-center justify-between">
+              <span class="text-white font-bold text-sm flex items-center gap-2">
+                <span class="bg-white text-gray-800 text-xs font-black px-2 py-0.5 rounded">F2</span>
+                DSM2
+              </span>
+              <span class="text-gray-400 text-xs">6 disciplinas</span>
+            </div>
+            <div class="p-4 bg-gray-50">
+              <div class="font-mono text-sm text-gray-800 bg-white border border-gray-200 rounded-lg px-4 py-3 mb-3 overflow-x-auto whitespace-nowrap">
+                MP = ( 3 × <span class="text-red-600 font-bold">(AT1+AT2)/2</span> + 3 × <span class="text-indigo-600 font-bold">AVI</span> + 3 × <span class="text-indigo-600 font-bold">PJI</span> + 1 × <span class="text-amber-600 font-bold">MRT</span> ) ÷ 10 + <span class="text-green-600 font-bold">QTE</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs text-center">
+                <div class="bg-red-50 border border-red-100 rounded-lg p-2"><span class="font-bold text-red-700">(AT1+AT2)/2</span><br><span class="text-gray-500">peso 3</span></div>
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-2"><span class="font-bold text-indigo-700">AVI</span><br><span class="text-gray-500">peso 3</span></div>
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-2"><span class="font-bold text-indigo-700">PJI</span><br><span class="text-gray-500">peso 3</span></div>
+                <div class="bg-amber-50 border border-amber-100 rounded-lg p-2"><span class="font-bold text-amber-700">MRT</span><br><span class="text-gray-500">peso 1</span></div>
+                <div class="bg-green-50 border border-green-100 rounded-lg p-2"><span class="font-bold text-green-700">QTE</span><br><span class="text-gray-500">bônus</span></div>
+              </div>
+              <p class="text-xs text-gray-400 mt-2">Soma dos pesos: 3+3+3+1 = <strong>10</strong></p>
+            </div>
+          </div>
+
+          <!-- F3 -->
+          <div class="rounded-xl border border-gray-200 overflow-hidden">
+            <div class="bg-gray-700 px-4 py-2.5 flex items-center justify-between">
+              <span class="text-white font-bold text-sm flex items-center gap-2">
+                <span class="bg-white text-gray-800 text-xs font-black px-2 py-0.5 rounded">F3</span>
+                DSM3, DSM4 e DSM5 — disciplinas comuns
+              </span>
+              <span class="text-gray-400 text-xs">exceto GAPS / LDW / LDDM</span>
+            </div>
+            <div class="p-4 bg-gray-50">
+              <div class="font-mono text-sm text-gray-800 bg-white border border-gray-200 rounded-lg px-4 py-3 mb-3 overflow-x-auto whitespace-nowrap">
+                MP = ( 2 × <span class="text-red-600 font-bold">(AT1+AT2)/2</span> + 3 × <span class="text-indigo-600 font-bold">AVI</span> + 3 × <span class="text-indigo-600 font-bold">PJI</span> + 1 × <span class="text-amber-600 font-bold">LP</span> + 1 × <span class="text-amber-600 font-bold">MRT</span> ) ÷ 10 + <span class="text-green-600 font-bold">QTE</span>
+              </div>
+              <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-xs text-center">
+                <div class="bg-red-50 border border-red-100 rounded-lg p-2"><span class="font-bold text-red-700">(AT1+AT2)/2</span><br><span class="text-gray-500">peso 2</span></div>
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-2"><span class="font-bold text-indigo-700">AVI</span><br><span class="text-gray-500">peso 3</span></div>
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-2"><span class="font-bold text-indigo-700">PJI</span><br><span class="text-gray-500">peso 3</span></div>
+                <div class="bg-amber-50 border border-amber-100 rounded-lg p-2"><span class="font-bold text-amber-700">LP</span><br><span class="text-gray-500">peso 1</span></div>
+                <div class="bg-amber-50 border border-amber-100 rounded-lg p-2"><span class="font-bold text-amber-700">MRT</span><br><span class="text-gray-500">peso 1</span></div>
+                <div class="bg-green-50 border border-green-100 rounded-lg p-2"><span class="font-bold text-green-700">QTE</span><br><span class="text-gray-500">bônus</span></div>
+              </div>
+              <p class="text-xs text-gray-400 mt-2">Soma dos pesos: 2+3+3+1+1 = <strong>10</strong></p>
+            </div>
+          </div>
+
+          <!-- F4 -->
+          <div class="rounded-xl border border-red-200 overflow-hidden">
+            <div class="bg-red-900 px-4 py-2.5 flex items-center justify-between">
+              <span class="text-white font-bold text-sm flex items-center gap-2">
+                <span class="bg-white text-red-900 text-xs font-black px-2 py-0.5 rounded">F4</span>
+                Disciplinas-chave de Laboratório de Práticas (LP)
+              </span>
+              <span class="text-red-300 text-xs">GAPS · LDW · LDDM</span>
+            </div>
+            <div class="p-4 bg-red-50">
+              <div class="font-mono text-sm text-gray-800 bg-white border border-red-200 rounded-lg px-4 py-3 mb-3 overflow-x-auto whitespace-nowrap">
+                MP = ( 1 × <span class="text-red-600 font-bold">(AT1+AT2)/2</span> + 3 × <span class="text-indigo-600 font-bold">AVI</span> + 3 × <span class="text-indigo-600 font-bold">PJI</span> + <span class="text-orange-600 font-bold text-base">2</span> × <span class="text-amber-600 font-bold">LP</span> + 1 × <span class="text-amber-600 font-bold">MRT</span> ) ÷ 10 + <span class="text-green-600 font-bold">QTE</span>
+              </div>
+              <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-xs text-center">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-2"><span class="font-bold text-red-700">(AT1+AT2)/2</span><br><span class="text-gray-500">peso <strong>1</strong></span></div>
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-2"><span class="font-bold text-indigo-700">AVI</span><br><span class="text-gray-500">peso 3</span></div>
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-2"><span class="font-bold text-indigo-700">PJI</span><br><span class="text-gray-500">peso 3</span></div>
+                <div class="bg-orange-50 border border-orange-200 rounded-lg p-2"><span class="font-bold text-orange-700">LP</span><br><span class="text-gray-500">peso <strong class="text-orange-600">2</strong></span></div>
+                <div class="bg-amber-50 border border-amber-100 rounded-lg p-2"><span class="font-bold text-amber-700">MRT</span><br><span class="text-gray-500">peso 1</span></div>
+                <div class="bg-green-50 border border-green-100 rounded-lg p-2"><span class="font-bold text-green-700">QTE</span><br><span class="text-gray-500">bônus</span></div>
+              </div>
+              <p class="text-xs text-gray-500 mt-2">Soma dos pesos: 1+3+3+2+1 = <strong>10</strong> · Diferença para F3: AT1/AT2 valem menos; LP vale o dobro.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- DIVISOR -->
+      <hr class="border-gray-100">
+
+      <!-- REGRAS DE APROVAÇÃO -->
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
+          <i class="fas fa-gavel text-gray-400"></i> Regras de aprovação
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+            <p class="text-3xl font-black text-green-600 mb-1">MP ≥ 6</p>
+            <p class="text-sm font-bold text-green-800">Aprovado direto</p>
+            <p class="text-xs text-green-700 mt-1">Sem necessidade de exame</p>
+          </div>
+          <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center">
+            <p class="text-3xl font-black text-yellow-600 mb-1">2 ≤ MP &lt; 6</p>
+            <p class="text-sm font-bold text-yellow-800">Exame final</p>
+            <p class="text-xs text-yellow-700 mt-1">MF = (MP + EXM) ÷ 2<br>Se MF &lt; MP, mantém a MP<br>MF ≥ 6 → Aprovado</p>
+          </div>
+          <div class="bg-red-50 border border-red-200 rounded-xl p-4 text-center">
+            <p class="text-3xl font-black text-red-600 mb-1">MP &lt; 2</p>
+            <p class="text-sm font-bold text-red-800">Reprovado direto</p>
+            <p class="text-xs text-red-700 mt-1">Sem direito a exame</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAPA DE DISCIPLINAS POR FÓRMULA -->
+      <hr class="border-gray-100">
+      <div>
+        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3 flex items-center gap-2">
+          <i class="fas fa-table text-gray-400"></i> Mapa de fórmulas por semestre
+        </h3>
+        <div class="overflow-x-auto rounded-xl border border-gray-200">
+          <table class="w-full text-xs text-center">
+            <thead>
+              <tr class="bg-gray-800 text-white">
+                <th class="px-3 py-2.5 text-left font-bold">Variável</th>
+                <th class="px-3 py-2.5 font-bold">DSM1</th>
+                <th class="px-3 py-2.5 font-bold">DSM2</th>
+                <th class="px-3 py-2.5 font-bold">DSM3<br><span class="font-normal text-gray-400">(comuns)</span></th>
+                <th class="px-3 py-2.5 font-bold text-yellow-300">DSM3<br><span class="font-normal">GAPS</span></th>
+                <th class="px-3 py-2.5 font-bold">DSM4<br><span class="font-normal text-gray-400">(comuns)</span></th>
+                <th class="px-3 py-2.5 font-bold text-yellow-300">DSM4<br><span class="font-normal">LDW</span></th>
+                <th class="px-3 py-2.5 font-bold">DSM5<br><span class="font-normal text-gray-400">(comuns)</span></th>
+                <th class="px-3 py-2.5 font-bold text-yellow-300">DSM5<br><span class="font-normal">LDDM</span></th>
+                <th class="px-3 py-2.5 font-bold">DSM6</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <tr class="bg-red-50">
+                <td class="px-3 py-2 text-left font-bold text-red-700">(AT1+AT2)/2</td>
+                <td class="px-3 py-2 font-bold">×4</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×2</td>
+                <td class="px-3 py-2 font-bold text-orange-600">×1</td>
+                <td class="px-3 py-2 font-bold">×2</td>
+                <td class="px-3 py-2 font-bold text-orange-600">×1</td>
+                <td class="px-3 py-2 font-bold">×2</td>
+                <td class="px-3 py-2 font-bold text-orange-600">×1</td>
+                <td class="px-3 py-2 font-bold">×4</td>
+              </tr>
+              <tr class="bg-indigo-50">
+                <td class="px-3 py-2 text-left font-bold text-indigo-700">AVI</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+              </tr>
+              <tr class="bg-indigo-50">
+                <td class="px-3 py-2 text-left font-bold text-indigo-700">PJI</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+                <td class="px-3 py-2 font-bold">×3</td>
+              </tr>
+              <tr class="bg-amber-50">
+                <td class="px-3 py-2 text-left font-bold text-amber-700">MRT</td>
+                <td class="px-3 py-2 text-gray-300">—</td>
+                <td class="px-3 py-2 font-bold">×1</td>
+                <td class="px-3 py-2 font-bold">×1</td>
+                <td class="px-3 py-2 font-bold">×1</td>
+                <td class="px-3 py-2 font-bold">×1</td>
+                <td class="px-3 py-2 font-bold">×1</td>
+                <td class="px-3 py-2 font-bold">×1</td>
+                <td class="px-3 py-2 font-bold">×1</td>
+                <td class="px-3 py-2 text-gray-300">—</td>
+              </tr>
+              <tr class="bg-amber-50">
+                <td class="px-3 py-2 text-left font-bold text-amber-700">LP</td>
+                <td class="px-3 py-2 text-gray-300">—</td>
+                <td class="px-3 py-2 text-gray-300">—</td>
+                <td class="px-3 py-2 font-bold">×1</td>
+                <td class="px-3 py-2 font-bold text-orange-600">×2</td>
+                <td class="px-3 py-2 font-bold">×1</td>
+                <td class="px-3 py-2 font-bold text-orange-600">×2</td>
+                <td class="px-3 py-2 font-bold">×1</td>
+                <td class="px-3 py-2 font-bold text-orange-600">×2</td>
+                <td class="px-3 py-2 text-gray-300">—</td>
+              </tr>
+              <tr class="bg-green-50">
+                <td class="px-3 py-2 text-left font-bold text-green-700">QTE (bônus)</td>
+                <td class="px-3 py-2 text-green-600 font-bold">+0–1,3</td>
+                <td class="px-3 py-2 text-green-600 font-bold">+0–1,3</td>
+                <td class="px-3 py-2 text-green-600 font-bold">+0–1,3</td>
+                <td class="px-3 py-2 text-green-600 font-bold">+0–1,3</td>
+                <td class="px-3 py-2 text-green-600 font-bold">+0–1,3</td>
+                <td class="px-3 py-2 text-green-600 font-bold">+0–1,3</td>
+                <td class="px-3 py-2 text-green-600 font-bold">+0–1,3</td>
+                <td class="px-3 py-2 text-green-600 font-bold">+0–1,3</td>
+                <td class="px-3 py-2 text-green-600 font-bold">+0–1,3</td>
+              </tr>
+              <tr class="bg-gray-100 font-bold">
+                <td class="px-3 py-2 text-left text-gray-600">Fórmula</td>
+                <td class="px-3 py-2 text-gray-700">F1</td>
+                <td class="px-3 py-2 text-gray-700">F2</td>
+                <td class="px-3 py-2 text-gray-700">F3</td>
+                <td class="px-3 py-2 text-red-700">F4</td>
+                <td class="px-3 py-2 text-gray-700">F3</td>
+                <td class="px-3 py-2 text-red-700">F4</td>
+                <td class="px-3 py-2 text-gray-700">F3</td>
+                <td class="px-3 py-2 text-red-700">F4</td>
+                <td class="px-3 py-2 text-gray-700">F1</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="text-xs text-gray-400 mt-2 text-center">Fonte: NDE-DSM-01/2025 · Tabela 1 — Relação de variáveis e pesos do sistema SIGA</p>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 <script>
 // ═══════════════════════════════════════════════
-// DISCIPLINAS
+// DISCIPLINAS — conforme Matriz Curricular Fatec Registro DSM
+//
+// DSM1: 6 disciplinas (sem Inglês)
+// DSM2: 6 disciplinas (sem Inglês)
+// DSM3: 7 disciplinas (Inglês I + GAPS como LP)
+// DSM4: 7 disciplinas (Inglês II + LDW como LP)
+// DSM5: 7 disciplinas (Inglês III + LDDM como LP)
+// DSM6: 7 disciplinas (Inglês IV)
 // ═══════════════════════════════════════════════
 const DISC = {
   1: [
-    { id:101, nome:'Técnicas de Programação' },
-    { id:102, nome:'Fundamentos de Redes de Computadores' },
-    { id:103, nome:'Engenharia de Software I' },
-    { id:104, nome:'Interface Web' },
-    { id:105, nome:'Fundamentos de Banco de Dados' },
-    { id:106, nome:'Matemática Computacional' },
-    { id:107, nome:'Inglês I' },
+    { id:101, nome:'Modelagem de Banco de Dados' },
+    { id:102, nome:'Desenvolvimento Web I' },
+    { id:103, nome:'Algoritmos e Lógica de Programação' },
+    { id:104, nome:'Engenharia de Software I' },
+    { id:105, nome:'Design Digital' },
+    { id:106, nome:'Sistemas Operacionais e Redes de Computadores' },
   ],
   2: [
-    { id:201, nome:'Desenvolvimento Web I' },
-    { id:202, nome:'Programação Orientada a Objetos' },
-    { id:203, nome:'Banco de Dados SQL' },
+    { id:201, nome:'Banco de Dados Relacional' },
+    { id:202, nome:'Desenvolvimento Web II' },
+    { id:203, nome:'Técnicas de Programação I' },
     { id:204, nome:'Engenharia de Software II' },
-    { id:205, nome:'Redes de Computadores' },
-    { id:206, nome:'Análise Estatística e Qualidade' },
-    { id:207, nome:'Inglês II' },
+    { id:205, nome:'Estrutura de Dados' },
+    { id:206, nome:'Matemática para Computação' },
   ],
   3: [
-    { id:301, nome:'Desenvolvimento Web II', lp:false },
-    { id:302, nome:'GAPS — Gerência de Projetos Ágeis e Soft Skills', lp:true },
-    { id:303, nome:'Banco de Dados NoSQL', lp:false },
-    { id:304, nome:'Programação para Dispositivos Móveis I', lp:false },
-    { id:305, nome:'Inteligência Artificial', lp:false },
-    { id:306, nome:'Computação em Nuvem I', lp:false },
-    { id:307, nome:'Inglês III', lp:false },
+    { id:301, nome:'Banco de Dados Não Relacional', lp:false },
+    { id:302, nome:'Desenvolvimento Web III', lp:false },
+    { id:303, nome:'Técnicas de Programação II', lp:false },
+    { id:304, nome:'GAPS — Gestão Ágil de Projetos de Software', lp:true },
+    { id:305, nome:'Interação Humano Computador', lp:false },
+    { id:306, nome:'Álgebra Linear', lp:false },
+    { id:307, nome:'Inglês I', lp:false },
   ],
   4: [
-    { id:401, nome:'Desenvolvimento Web III', lp:false },
+    { id:401, nome:'Integração e Entrega Contínua', lp:false },
     { id:402, nome:'LDW — Laboratório de Desenvolvimento Web', lp:true },
-    { id:403, nome:'Banco de Dados Avançado', lp:false },
-    { id:404, nome:'Segurança da Informação', lp:false },
-    { id:405, nome:'Programação para Dispositivos Móveis II', lp:false },
-    { id:406, nome:'Aprendizagem de Máquina', lp:false },
-    { id:407, nome:'Inglês IV', lp:false },
+    { id:403, nome:'Programação para Dispositivos Móveis I', lp:false },
+    { id:404, nome:'Internet das Coisas e Aplicações', lp:false },
+    { id:405, nome:'Experiência do Usuário', lp:false },
+    { id:406, nome:'Estatística Aplicada', lp:false },
+    { id:407, nome:'Inglês II', lp:false },
   ],
   5: [
-    { id:501, nome:'Segurança no Desenv. de Aplicações', lp:false },
-    { id:502, nome:'LDDM — Lab. de Desenv. Dispositivos Móveis', lp:true },
-    { id:503, nome:'Programação para Dispositivos Móveis III', lp:false },
-    { id:504, nome:'Aprendizagem de Máquina Avançada', lp:false },
-    { id:505, nome:'Computação em Nuvem II', lp:false },
+    { id:501, nome:'Segurança no Desenvolvimento de Aplicações', lp:false },
+    { id:502, nome:'LDDM — Lab. de Desenvolvimento p/ Dispositivos Móveis', lp:true },
+    { id:503, nome:'Programação para Dispositivos Móveis II', lp:false },
+    { id:504, nome:'Aprendizagem de Máquina', lp:false },
+    { id:505, nome:'Computação em Nuvem I', lp:false },
     { id:506, nome:'Fundamentos da Redação Técnica', lp:false },
-    { id:507, nome:'Inglês V', lp:false },
+    { id:507, nome:'Inglês III', lp:false },
   ],
   6: [
     { id:601, nome:'Mineração de Dados' },
     { id:602, nome:'Lab. de Desenvolvimento Multiplataforma' },
     { id:603, nome:'Qualidade e Testes de Software' },
     { id:604, nome:'Processamento de Linguagem Natural' },
-    { id:605, nome:'Computação em Nuvem III' },
+    { id:605, nome:'Computação em Nuvem II' },
     { id:606, nome:'Ética Profissional e Patente' },
-    { id:607, nome:'Inglês VI' },
+    { id:607, nome:'Inglês IV' },
   ],
 };
 
 const LP_NOME = { 3:'GAPS', 4:'LDW', 5:'LDDM' };
 
 // ═══════════════════════════════════════════════
-// PESOS — NDE-DSM-01/2025 (01/07/2025)
-// AT1 e AT2 entram individualmente; soma = (AT1+AT2) * pesoIndividual
-// que é equivalente a (AT1+AT2)/2 * pesoTotal na fórmula do SIGA
+// PESOS — NDE-DSM-01/2025
 // ═══════════════════════════════════════════════
 function getPesos(sem, isLPChave) {
   if (sem === 1 || sem === 6) return { AT1:2,   AT2:2,   AVI:3, PJI:3 };
@@ -214,10 +561,10 @@ function getPesos(sem, isLPChave) {
 // ═══════════════════════════════════════════════
 // ESTADO GLOBAL
 // ═══════════════════════════════════════════════
-let semAtual  = 1;
-let lpMode    = 'geral';
-let globals   = { AVI:'', PJI:'', QTE:'' }; // globais de semestre
-let notas     = {}; // notas[id] = { AT1, AT2, MRT, LP, EXM }
+let semAtual = 1;
+let lpMode   = 'geral';
+let globals  = { AVI:'', PJI:'', QTE:'' };
+let notas    = {};
 
 function init() {
   [1,2,3,4,5,6].forEach(s => {
@@ -228,36 +575,28 @@ function init() {
   setSem(1);
 }
 
-// ═══════════════════════════════════════════════
-// GETTERS de valor (globais + por disciplina)
-// ═══════════════════════════════════════════════
 function gv(campo, id) {
-  // AVI, PJI, QTE → global; resto → por disciplina
-  if (['AVI','PJI','QTE'].includes(campo)) {
-    return parseFloat(globals[campo]) || 0;
-  }
-  return parseFloat(notas[id][campo]) || 0;
+  if (['AVI','PJI','QTE'].includes(campo)) return parseNota(globals[campo]) || 0;
+  return parseNota(notas[id][campo]) || 0;
 }
 
 function calcMP_raw(id, sem, isLPChave) {
   const pesos = getPesos(sem, isLPChave);
   let soma = 0;
-  for (const [campo, peso] of Object.entries(pesos)) {
-    soma += gv(campo, id) * peso;
-  }
+  for (const [campo, peso] of Object.entries(pesos)) soma += gv(campo, id) * peso;
   return soma / 10;
 }
 
 // ═══════════════════════════════════════════════
-// NAVEGAÇÃO / ESTADO
+// NAVEGAÇÃO
 // ═══════════════════════════════════════════════
 function setSem(s) {
   semAtual = s;
   lpMode   = 'geral';
 
-  [1,2,3,4,5,6].forEach(i => {
-    document.getElementById('ts'+i).classList.toggle('active', i === s);
-  });
+  [1,2,3,4,5,6].forEach(i =>
+    document.getElementById('ts'+i).classList.toggle('active', i === s)
+  );
   document.getElementById('hdr-title').textContent = 'Boletim DSM' + s;
 
   const notices = {
@@ -290,22 +629,76 @@ function setLPMode(mode) {
   renderLista();
 }
 
+// ─── helpers de parse/format ───────────────────
+function parseNota(raw) {
+  if (raw === '' || raw == null) return NaN;
+  return parseFloat(String(raw).replace(',', '.'));
+}
+function clampNota(val, max) {
+  if (isNaN(val)) return NaN;
+  return Math.min(max, Math.max(0, val));
+}
+function fmt(val) {
+  return isNaN(val) ? '' : val.toFixed(2).replace('.', ',');
+}
+
+// Chamado no evento input — aceita digitação livre
 function setGlobal(campo, val) {
-  if (campo === 'QTE') {
-    val = Math.min(1.3, Math.max(0, parseFloat(val) || 0)).toString();
-  }
-  globals[campo] = val;
-  // propaga para os inputs read-only de cada card
+  const max   = campo === 'QTE' ? 1.3 : 10;
+  const raw   = parseNota(val);
+  const final = isNaN(raw) ? '' : String(clampNota(raw, max));
+  globals[campo] = final;
   DISC[semAtual].forEach(d => {
     const el = document.getElementById(`ro-${campo}-${d.id}`);
-    if (el) el.value = val !== '' ? parseFloat(val).toFixed(1) : '';
+    if (el) el.value = final !== '' ? fmt(parseFloat(final)) : '';
     recalc(d.id);
   });
   updateContadores();
 }
 
+// Chamado no blur — aplica clamp + formatação 2 casas
+function blurGlobal(campo, el) {
+  const max = campo === 'QTE' ? 1.3 : 10;
+  const raw = parseNota(el.value);
+  if (!isNaN(raw)) {
+    const clamped = clampNota(raw, max);
+    globals[campo] = String(clamped);
+    el.value = fmt(clamped);
+    DISC[semAtual].forEach(d => {
+      const ro = document.getElementById(`ro-${campo}-${d.id}`);
+      if (ro) ro.value = fmt(clamped);
+      recalc(d.id);
+    });
+  } else {
+    globals[campo] = '';
+    el.value = '';
+    DISC[semAtual].forEach(d => {
+      const ro = document.getElementById(`ro-${campo}-${d.id}`);
+      if (ro) ro.value = '';
+      recalc(d.id);
+    });
+  }
+  updateContadores();
+}
+
 function setNota(id, campo, val) {
-  notas[id][campo] = val;
+  const raw = parseNota(val);
+  notas[id][campo] = isNaN(raw) ? '' : String(clampNota(raw, 10));
+  recalc(id);
+  updateContadores();
+}
+
+// Chamado no blur de cada nota — formata o campo
+function blurNota(el, id, campo) {
+  const raw = parseNota(el.value);
+  if (!isNaN(raw)) {
+    const clamped = clampNota(raw, 10);
+    notas[id][campo] = String(clamped);
+    el.value = fmt(clamped);
+  } else {
+    notas[id][campo] = '';
+    el.value = '';
+  }
   recalc(id);
   updateContadores();
 }
@@ -328,22 +721,18 @@ function renderLista() {
                : [3,4,5].includes(semAtual) ? 'Fórmula 3'
                : 'Fórmula 1';
 
-    // Campos editáveis por disciplina: AT1, AT2, MRT (se existir), LP (se existir)
-    // AVI, PJI, QTE → read-only vindos do global
     const inputsHTML = Object.entries(pesos).map(([campo, peso]) => {
       const isGlobal = ['AVI','PJI','QTE'].includes(campo);
       const isOpt    = campo === 'MRT' || campo === 'LP';
-      const gVal     = globals[campo] !== '' ? parseFloat(globals[campo]).toFixed(1) : '';
+      const gVal     = globals[campo] !== '' ? fmt(parseNota(globals[campo])) : '';
 
       if (isGlobal) {
-        // Read-only — espelho do global
         return `
           <div>
             <label class="block text-[10px] font-bold mb-1 text-center text-indigo-500">
-              ${campo}
-              <span class="text-[9px] font-normal px-1 rounded text-indigo-400 bg-indigo-50">×${peso}</span>
+              ${campo} <span class="text-[9px] font-normal px-1 rounded text-indigo-400 bg-indigo-50">×${peso}</span>
             </label>
-            <input id="ro-${campo}-${d.id}" type="number" step="0.1"
+            <input id="ro-${campo}-${d.id}" type="text"
               value="${gVal}" readonly tabindex="-1"
               class="input-global-readonly w-full"
               title="Definido no painel acima">
@@ -354,16 +743,16 @@ function renderLista() {
       return `
         <div>
           <label class="block text-[10px] font-bold mb-1 text-center ${isOpt ? 'text-gray-400' : 'text-gray-500'}">
-            ${campo}
-            <span class="text-[9px] font-normal px-1 rounded ${isOpt ? 'text-gray-400 bg-gray-100' : 'text-red-400 bg-red-50'}">×${peso}</span>
+            ${campo} <span class="text-[9px] font-normal px-1 rounded ${isOpt ? 'text-gray-400 bg-gray-100' : 'text-red-400 bg-red-50'}">×${peso}</span>
           </label>
-          <input type="number" step="0.1" min="0" max="10" placeholder="—" value="${val}"
+          <input type="text" inputmode="decimal" placeholder="—" value="${val !== '' ? fmt(parseFloat(val)) : ''}"
             oninput="setNota(${d.id},'${campo}',this.value)"
-            class="input-nota">
+            onblur="blurNota(this,${d.id},'${campo}')"
+            class="input-nota" autocomplete="off">
         </div>`;
     }).join('');
 
-    const ncols = Object.keys(pesos).length;
+    const ncols    = Object.keys(pesos).length;
     const gridCols = Math.min(ncols, 6);
 
     const avisLPHtml = avisoLP ? `
@@ -375,8 +764,6 @@ function renderLista() {
 
     container.innerHTML += `
       <div id="card-${d.id}" class="bg-white rounded-xl shadow-sm border ${avisoLP ? 'border-amber-300' : 'border-gray-200'} overflow-hidden fade-in">
-
-        <!-- Header card -->
         <div class="p-4 flex items-center justify-between border-b border-gray-100 bg-gray-50/70">
           <div class="flex items-center gap-3 min-w-0 flex-1">
             <div id="barra-${d.id}" class="flex-shrink-0 w-1.5 h-12 rounded-full bg-gray-200 transition-colors duration-300"></div>
@@ -393,30 +780,28 @@ function renderLista() {
           </div>
         </div>
 
-        <!-- Inputs -->
         <div class="p-4">
           <div class="grid gap-2.5 mb-2" style="grid-template-columns: repeat(${gridCols}, minmax(0,1fr))">
             ${inputsHTML}
           </div>
           ${avisLPHtml}
 
-          <!-- Box Exame -->
           <div id="box-exame-${d.id}" class="d-none mt-3 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
             <div class="flex flex-col sm:flex-row sm:items-center gap-2">
               <div class="flex-1">
                 <label class="text-[10px] font-bold text-yellow-800 uppercase tracking-wider flex items-center gap-1 mb-1.5">
                   <i class="fas fa-exclamation-circle"></i> Exame final necessário
                 </label>
-                <input type="number" step="0.1" min="0" max="10" placeholder="Nota do exame"
-                  value="${notas[d.id].EXM || ''}"
+                <input type="text" inputmode="decimal" placeholder="0,00"
+                  value="${notas[d.id].EXM !== '' ? fmt(parseFloat(notas[d.id].EXM)) : ''}"
                   oninput="setNota(${d.id},'EXM',this.value)"
-                  class="w-full sm:w-36 p-2 text-sm border border-yellow-300 rounded-lg focus:border-yellow-500 outline-none bg-white font-bold text-yellow-900">
+                  onblur="blurNota(this,${d.id},'EXM')"
+                  class="w-full sm:w-36 p-2 text-sm border border-yellow-300 rounded-lg focus:border-yellow-500 outline-none bg-white font-bold text-yellow-900" autocomplete="off">
               </div>
               <div id="mp-info-${d.id}" class="text-sm font-bold text-yellow-700 sm:mt-4"></div>
             </div>
           </div>
 
-          <!-- Footer -->
           <div id="footer-${d.id}" class="d-none mt-3 flex justify-between items-center border-t border-gray-100 pt-2 gap-2">
             <span id="detalhe-${d.id}" class="text-[10px] font-mono text-gray-400 leading-relaxed"></span>
             <span id="status-txt-${d.id}" class="text-sm font-bold flex-shrink-0"></span>
@@ -438,7 +823,7 @@ function useFormula4(d) {
 
 function hasAnyInput(id) {
   const n = notas[id];
-  const localFilled = Object.entries(n).some(([k,v]) => k !== 'EXM' && v !== '');
+  const localFilled  = Object.entries(n).some(([k,v]) => k !== 'EXM' && v !== '');
   const globalFilled = globals.AVI !== '' || globals.PJI !== '' || globals.QTE !== '';
   return localFilled || globalFilled;
 }
@@ -447,9 +832,8 @@ function recalc(id) {
   const d = DISC[semAtual].find(x => x.id === id);
   if (!d) return;
 
-  const useLP = useFormula4(d);
-  const n     = notas[id];
-
+  const useLP     = useFormula4(d);
+  const n         = notas[id];
   const barra     = document.getElementById('barra-'+id);
   const mediaEl   = document.getElementById('media-'+id);
   const boxExame  = document.getElementById('box-exame-'+id);
@@ -460,7 +844,6 @@ function recalc(id) {
 
   if (!barra) return;
 
-  // Se nenhum campo foi tocado ainda, fica em branco
   if (!hasAnyInput(id)) {
     barra.className     = 'flex-shrink-0 w-1.5 h-12 rounded-full bg-gray-200 transition-colors duration-300';
     mediaEl.className   = 'text-3xl font-bold text-gray-300 tabular-nums';
@@ -470,45 +853,42 @@ function recalc(id) {
     return;
   }
 
-  const qteVal = Math.min(1.3, parseFloat(globals.QTE) || 0);
+  const qteVal = Math.min(1.3, parseNota(globals.QTE) || 0);
   const mp_raw = calcMP_raw(id, semAtual, useLP);
   const mp     = Math.min(10, mp_raw + qteVal);
-  const exm    = parseFloat(n.EXM);
+  const exm    = parseNota(n.EXM);
 
-  let notaFinal  = mp;
-  let statusCode = '';
-  let statusMsg  = '';
-  let cor        = '';
-  let detalheStr = `MP base: ${mp_raw.toFixed(2)} + QTE: ${qteVal.toFixed(1)} = ${mp.toFixed(2)}`;
+  let notaFinal = mp;
+  let statusMsg = '';
+  let cor       = '';
+  const fv = v => v.toFixed(2).replace('.',',');
+  let detalheStr = `MP base: ${fv(mp_raw)} + QTE: ${fv(qteVal)} = ${fv(mp)}`;
 
   if (mp >= 6) {
-    statusCode = 'AP'; statusMsg = 'Aprovado direto ✓'; cor = 'green';
+    statusMsg = 'Aprovado direto ✓'; cor = 'green';
   } else if (mp < 2) {
-    statusCode = 'RP'; statusMsg = 'Reprovado (MP < 2)'; cor = 'red';
+    statusMsg = 'Reprovado (MP < 2)'; cor = 'red';
   } else {
-    statusCode = 'EX'; statusMsg = 'Aguardando exame'; cor = 'yellow';
+    statusMsg = 'Aguardando exame'; cor = 'yellow';
     if (!isNaN(exm)) {
       const mf_calc = (mp + exm) / 2;
-      notaFinal = Math.min(10, mf_calc < mp ? mp : mf_calc);
-      detalheStr = `MF = (MP ${mp.toFixed(2)} + EXM ${exm.toFixed(2)}) / 2 = ${notaFinal.toFixed(2)}`;
-      if (notaFinal >= 6) {
-        statusCode = 'AP'; statusMsg = 'Aprovado no exame ✓'; cor = 'green';
-      } else {
-        statusCode = 'RP'; statusMsg = 'Reprovado no exame'; cor = 'red';
-      }
+      notaFinal  = Math.min(10, mf_calc < mp ? mp : mf_calc);
+      detalheStr = `MF = (MP ${fv(mp)} + EXM ${fv(exm)}) / 2 = ${fv(notaFinal)}`;
+      if (notaFinal >= 6) { statusMsg = 'Aprovado no exame ✓'; cor = 'green'; }
+      else                { statusMsg = 'Reprovado no exame';   cor = 'red';   }
     }
   }
 
   const barraMap = { green:'bg-green-500', yellow:'bg-yellow-500', red:'bg-red-500' };
   const textMap  = { green:'text-green-600', yellow:'text-yellow-600', red:'text-red-600' };
 
-  barra.className   = `flex-shrink-0 w-1.5 h-12 rounded-full transition-colors duration-300 ${barraMap[cor]}`;
-  mediaEl.className = `text-3xl font-bold tabular-nums ${textMap[cor]}`;
-  mediaEl.textContent = notaFinal.toFixed(1);
+  barra.className     = `flex-shrink-0 w-1.5 h-12 rounded-full transition-colors duration-300 ${barraMap[cor]}`;
+  mediaEl.className   = `text-3xl font-bold tabular-nums ${textMap[cor]}`;
+  mediaEl.textContent = notaFinal.toFixed(2).replace('.', ',');
 
   if (mp >= 2 && mp < 6) {
     boxExame.classList.remove('d-none');
-    mpInfoEl.textContent = `MP = ${mp.toFixed(2)}`;
+    mpInfoEl.textContent = `MP = ${fv(mp)}`;
   } else {
     boxExame.classList.add('d-none');
   }
@@ -524,10 +904,10 @@ function updateContadores() {
   DISC[semAtual].forEach(d => {
     if (!hasAnyInput(d.id)) return;
     const useLP  = useFormula4(d);
-    const qteVal = Math.min(1.3, parseFloat(globals.QTE) || 0);
+    const qteVal = Math.min(1.3, parseNota(globals.QTE) || 0);
     const mp_raw = calcMP_raw(d.id, semAtual, useLP);
     const mp     = Math.min(10, mp_raw + qteVal);
-    const exm    = parseFloat(notas[d.id].EXM);
+    const exm    = parseNota(notas[d.id].EXM);
 
     if (mp >= 6)  { ap++; return; }
     if (mp < 2)   { rp++; return; }
@@ -549,24 +929,17 @@ function updateContadores() {
 function salvarImagem() {
   const btn   = document.getElementById('btn-salvar');
   const lista = document.getElementById('lista');
-
-  btn.disabled    = true;
-  btn.innerHTML   = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
-
+  btn.disabled  = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Gerando...';
   html2canvas(lista, {
-    backgroundColor: '#f3f4f6',
-    scale: 2,
-    useCORS: true,
-    logging: false,
+    backgroundColor: '#f3f4f6', scale: 2, useCORS: true, logging: false,
     onclone: (doc) => {
-      doc.querySelectorAll('#lista input').forEach(inp => {
-        inp.setAttribute('value', inp.value);
-      });
+      doc.querySelectorAll('#lista input').forEach(inp => inp.setAttribute('value', inp.value));
     },
   }).then(canvas => {
-    const link      = document.createElement('a');
-    link.download   = `boletim-dsm${semAtual}.png`;
-    link.href       = canvas.toDataURL('image/png');
+    const link    = document.createElement('a');
+    link.download = `boletim-dsm${semAtual}.png`;
+    link.href     = canvas.toDataURL('image/png');
     link.click();
   }).finally(() => {
     btn.disabled  = false;
